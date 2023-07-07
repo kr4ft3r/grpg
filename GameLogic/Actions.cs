@@ -14,6 +14,16 @@ namespace GRPG.GameLogic
             Actor = actor;
             Location = location;
         }
+
+        public ActionTarget(Actor actor)
+        {
+            Actor = actor;
+        }
+
+        public ActionTarget(int loc)
+        {
+            Location = loc;
+        }
     }
 
     public struct ActionResult
@@ -31,9 +41,9 @@ namespace GRPG.GameLogic
         public static Action Move = new ActionMove();
         public static Action Disintegrate = new ActionDisintegrate();
 
-        public readonly string Name;
-        public readonly CounterDict<Resource> Cost;
-        public readonly TargetType TargetType;
+        public string Name { get; protected set; }
+        public CounterDict<Resource> Cost { get; protected set; }
+        public TargetType TargetType { get; protected set; }
 
         public virtual ActionValidity GetActionValidity(Mission mission, Actor actor)
         {
@@ -59,12 +69,12 @@ namespace GRPG.GameLogic
             return CalcSuccessChance(mission, actor, target);
         }
 
-        internal virtual ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        protected virtual ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
         {
             return ActionValidity.Valid;
         }
 
-        internal virtual int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        protected virtual int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
         {
             return 100;
         }
@@ -74,9 +84,12 @@ namespace GRPG.GameLogic
 
     public class ActionMove : Action
     {
-        public new readonly string Name = "Move";
-        public new readonly TargetType TargetType = TargetType.Location;
-        public new readonly CounterDict<Resource> Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
+        public ActionMove()
+        {
+            Name = "Move";
+            TargetType = TargetType.Location;
+            Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
+        }
 
         public override ActionValidity GetActionValidity(Mission mission, Actor actor)
         {
@@ -84,7 +97,7 @@ namespace GRPG.GameLogic
             return base.GetActionValidity(mission, actor);
         }
 
-        internal override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        protected override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
         {
             if (!mission.Connections[actor.Location, target.Location].CanMove) return ActionValidity.LocationNotAccessible;
             return ActionValidity.Valid;
@@ -99,17 +112,21 @@ namespace GRPG.GameLogic
 
     public class ActionDisintegrate : Action
     {
-        public new readonly string Name = "Disintegrating Punch";
-        public new readonly TargetType TargetType = TargetType.Actor;
-        public new readonly CounterDict<Resource> Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
-
-        internal override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        public ActionDisintegrate()
         {
-            return target.Location == actor.Location ? ActionValidity.Valid : ActionValidity.OutOfRange;
+            Name = "Disintegrating Punch";
+            TargetType = TargetType.Actor;
+            Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
         }
 
-        internal override int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        protected override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
         {
+            return target.Actor.Location == actor.Location ? ActionValidity.Valid : ActionValidity.OutOfRange;
+        }
+
+        protected override int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        {
+            if (actor.Effects.Contains(Effect.SureHit)) return 100;
             if (target.Actor.Equals(actor)) return 99;
             return 50;
         }
@@ -118,6 +135,7 @@ namespace GRPG.GameLogic
         {
             var chance = GetSuccessChance(mission, actor, target);
             var roll = Dice.Roll(100);
+            System.Console.WriteLine("Rolling for " + chance + " -> " + roll);
             if (roll <= chance)
             {
                 mission.Actors.Remove(actor);

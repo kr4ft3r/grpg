@@ -8,7 +8,7 @@ namespace GRPG.GameLogic
     {
         public List<Action> Actions = new List<Action> { Action.Move, Action.Disintegrate };
         public CounterDict<Resource> PerBattleResources = new CounterDict<Resource>();
-        public CounterDict<Resource> PerTurnResources = new CounterDict<Resource>();
+        public CounterDict<Resource> PerTurnResources = new CounterDict<Resource>(Resource.PrimaryAction, 2);
     }
 
     public class Actor
@@ -32,15 +32,17 @@ namespace GRPG.GameLogic
             Resources.SetAll(Stats.PerBattleResources);
         }
 
-        public IEnumerable<Action> GetAllActions()
+        public List<Action> GetAllActions()
         {
             return new List<Action>(Stats.Actions);
         }
 
-        public IEnumerable<Action> GetAvailableActions()
+        public List<Action> GetAvailableActions()
         {
-            return GetAllActions().Where(action => action.GetActionValidity(Mission, this) == ActionValidity.Valid);
+            return GetAllActions().Where(action => action.GetActionValidity(Mission, this) == ActionValidity.Valid).ToList();
         }
+
+        public Action GetAction(string name) => GetAllActions().First(action => action.Name == name);
 
         internal void ApplyEffects()
         {

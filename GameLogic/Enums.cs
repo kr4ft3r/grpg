@@ -18,7 +18,8 @@ namespace GRPG.GameLogic
     {
         Hasted,
         Stunned,
-        Rooted
+        Rooted,
+        SureHit
     }
 
     public enum Team

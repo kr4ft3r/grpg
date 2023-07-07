@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,17 @@ namespace GRPG.GameLogic
             CanMove = canMove;
             HasCover = hasCover;
         }
+        public Connection(string props)
+        {
+            if (props.Contains('S')) CanSee = true;
+            if (props.Contains('M')) CanMove = true;
+            if (props.Contains('C')) HasCover = true;
+        }
     };
 
     public class Mission
     {
+        public int NumLocations { get; private set; }
         public Connection[,] Connections { get; private set; }
         public List<Actor> Actors = new List<Actor>();
         public List<Team> Teams = new List<Team>();
@@ -30,20 +38,37 @@ namespace GRPG.GameLogic
         public Team CurrentTeam { get { return Teams[CurrentTeamIndex]; } }
         public IEnumerable<Actor> GetTeamMembers(Team team) => Actors.Where(a => a.Team == team);
 
-        public Mission(uint numNodes)
+        public Mission(string[,] graph)
         {
-            Connections = new Connection[numNodes, numNodes];
+            MakeGraph(graph);
             Teams.Add(Team.Human);
             Teams.Add(Team.AI);
+        }
+
+        private void MakeGraph(string[,] graph)
+        {
+            NumLocations = (int) Math.Sqrt(graph.Length);
+            // Can't I just map a string matrix to a Conn matrix? :(
+            Connections = new Connection[NumLocations, NumLocations];
+            for (int i = 0; i < NumLocations; i++)
+                for (int j = 0; j < NumLocations; j++)
+                    Connections[i, j] = new Connection(graph[i, j]);
+        }
+
+        public void Start()
+        {
+            // TODO: Add mission status enum
+            foreach (var actor in this.GetTeamMembers(CurrentTeam)) actor.NewTurn();
         }
 
         public void EndTurn()
         {
             CurrentTeamIndex += 1;
+            if (CurrentTeamIndex >= this.Teams.Count) {
+                CurrentTeamIndex = 0;
+                TurnNumber += 1;
+            }
             foreach (var actor in this.GetTeamMembers(CurrentTeam)) actor.NewTurn();
-            if (CurrentTeamIndex < this.Teams.Count) return;
-            CurrentTeamIndex = 0;
-            TurnNumber += 1;
         }
     }
 
