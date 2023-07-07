@@ -29,52 +29,55 @@ namespace GRPG.GameLogic
             {"xxx", "xxx", "xxx", "xxx", "SMx", "Sxx"},
         };
 
-        // public static void Main(string[] args)
-        // {
-        //     System.Console.WriteLine("Hi.");
-        // }
+        public Mission Mission;
+        public Actor Player;
+        public Actor Monster;
+
+
+        [TestInitialize]
+        public void InitTest()
+        {
+            Mission = new Mission(Graph);
+            Player = new Actor(Mission, "Player", new CharacterStats(), Team.Human, 0);
+            Monster = new Actor(Mission, "Monster", new CharacterStats(), Team.AI, 5);
+            Mission.Actors.Add(Player);
+            Mission.Actors.Add(Monster);
+        }
 
         [TestMethod]
         public void HappyPathTest()
         {
-            // Setup mission
-            var mission = new Mission(Graph);
-            Assert.AreEqual(6, mission.NumLocations);
-            Assert.AreEqual(Team.Human, mission.CurrentTeam);
-
-            // Add some actors
-            var player = new Actor(mission, "Player", new CharacterStats(), Team.Human, 0);
-            var monster = new Actor(mission, "Monster", new CharacterStats(), Team.AI, 5);
-            mission.Actors.Add(player);
-            mission.Actors.Add(monster);
+            // 6 node graph, human goes first
+            Assert.AreEqual(6, Mission.NumLocations);
+            Assert.AreEqual(Team.Human, Mission.CurrentTeam);
 
             // Should be no APs before mission.Start()
-            Assert.AreEqual(0, mission.Actors[0].Resources[Resource.PrimaryAction]);
+            Assert.AreEqual(0, Mission.Actors[0].Resources[Resource.PrimaryAction]);
 
-            mission.Start();
+            Mission.Start();
 
             // Player should have 2AP, monster 0AP
-            Assert.AreEqual(2, player.Resources[Resource.PrimaryAction]);
-            Assert.AreEqual(0, monster.Resources[Resource.PrimaryAction]);
+            Assert.AreEqual(2, Player.Resources[Resource.PrimaryAction]);
+            Assert.AreEqual(0, Monster.Resources[Resource.PrimaryAction]);
 
             // Monster shouldn't be able to act on player turn
-            Assert.AreEqual(monster.GetAvailableActions().Count, 0);
+            Assert.AreEqual(Monster.GetAvailableActions().Count, 0);
 
             // Player should have two available actions
-            Assert.AreEqual(2, player.GetAvailableActions().Count);
+            Assert.AreEqual(2, Player.GetAvailableActions().Count);
 
             // Move to the same square and punch out of existence.
-            Action.Move.Perform(mission, player, new ActionTarget(1));
-            mission.EndTurn();
-            Action.Move.Perform(mission, monster, new ActionTarget(4));
-            mission.EndTurn();
-            Action.Move.Perform(mission, player, new ActionTarget(3));
-            mission.EndTurn();
-            Action.Move.Perform(mission, monster, new ActionTarget(3));
+            Action.Move.Perform(Mission, Player, new ActionTarget(1));
+            Mission.EndTurn();
+            Action.Move.Perform(Mission, Monster, new ActionTarget(4));
+            Mission.EndTurn();
+            Action.Move.Perform(Mission, Player, new ActionTarget(3));
+            Mission.EndTurn();
+            Action.Move.Perform(Mission, Monster, new ActionTarget(3));
 
-            monster.Effects.Add(Effect.SureHit, 1);
-            Action.Disintegrate.Perform(mission, monster, new ActionTarget(player));
-            Assert.AreEqual(1, mission.Actors.Count);
+            Monster.Effects.Add(Effect.SureHit, 1);
+            Action.Disintegrate.Perform(Mission, Monster, new ActionTarget(Player));
+            Assert.AreEqual(1, Mission.Actors.Count);
         }
     }
 }
