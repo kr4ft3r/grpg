@@ -1,1 +1,5 @@
 *.meta
+.vscode
+bin
+obj
+*.csproj
