@@ -8,7 +8,10 @@ namespace GRPG.GameLogic
     {
         public List<Action> Actions = new List<Action> { Action.Move, Action.Disintegrate };
         public CounterDict<Resource> PerBattleResources = new CounterDict<Resource>();
-        public CounterDict<Resource> PerTurnResources = new CounterDict<Resource>(Resource.PrimaryAction, 2);
+        public CounterDict<Resource> PerTurnResources = new CounterDict<Resource> {
+            {Resource.PrimaryAction, 1},
+            {Resource.MoveAction, 1},
+        };
     }
 
     public class Actor

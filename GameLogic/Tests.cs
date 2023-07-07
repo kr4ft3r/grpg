@@ -57,7 +57,7 @@ namespace GRPG.GameLogic
             Mission.Start();
 
             // Player should have 2AP, monster 0AP
-            Assert.AreEqual(2, Player.Resources[Resource.PrimaryAction]);
+            Assert.AreEqual(1, Player.Resources[Resource.PrimaryAction]);
             Assert.AreEqual(0, Monster.Resources[Resource.PrimaryAction]);
 
             // Monster shouldn't be able to act on player turn

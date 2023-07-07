@@ -105,7 +105,7 @@ namespace GRPG.GameLogic
         {
             Name = "Move";
             TargetType = TargetType.Location;
-            Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
+            Cost = new CounterDict<Resource>(Resource.MoveAction, 1);
         }
 
         public override ActionValidity GetActionValidity(Mission mission, Actor actor)
