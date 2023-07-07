@@ -62,8 +62,9 @@ namespace GRPG.GameLogic
         public CounterDict<Resource> Cost { get; protected set; }
         public TargetType TargetType { get; protected set; }
 
-        public virtual ActionValidity GetActionValidity(Mission mission, Actor actor)
+        public virtual ActionValidity GetActionValidity(Actor actor)
         {
+            var mission = actor.Mission;
             // Might change this to return a reason for being unable to perform action.
             if (mission.CurrentTeam != actor.Team) return ActionValidity.NotMyTurn;
             foreach (var item in Cost)
@@ -73,30 +74,30 @@ namespace GRPG.GameLogic
             return ActionValidity.Valid;
         }
 
-        public ActionValidity GetActionValidity(Mission mission, Actor actor, ActionTarget target)
+        public ActionValidity GetActionValidity(Actor actor, ActionTarget target)
         {
             if (TargetType == TargetType.Actor && target.Actor is null) return ActionValidity.WrongTargetType;
             if (TargetType == TargetType.Location && target.Location < 0) return ActionValidity.WrongTargetType;
-            return CheckTarget(mission, actor, target);
+            return CheckTarget(actor, target);
         }
 
-        public int GetSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        public int GetSuccessChance(Actor actor, ActionTarget target)
         {
-            if (GetActionValidity(mission, actor, target) != ActionValidity.Valid) return -1;
-            return CalcSuccessChance(mission, actor, target);
+            if (GetActionValidity(actor, target) != ActionValidity.Valid) return -1;
+            return CalcSuccessChance(actor, target);
         }
 
-        protected virtual ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        protected virtual ActionValidity CheckTarget(Actor actor, ActionTarget target)
         {
             return ActionValidity.Valid;
         }
 
-        protected virtual int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        protected virtual int CalcSuccessChance(Actor actor, ActionTarget target)
         {
             return 100;
         }
 
-        public abstract ActionResult Perform(Mission mission, Actor actor, ActionTarget target);
+        public abstract ActionResult Perform(Actor actor, ActionTarget target);
     }
 
     public class ActionMove : Action
@@ -105,24 +106,25 @@ namespace GRPG.GameLogic
         {
             Name = "Move";
             TargetType = TargetType.Location;
-            Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
+            Cost = new CounterDict<Resource>(Resource.MoveAction, 1);
         }
 
-        public override ActionValidity GetActionValidity(Mission mission, Actor actor)
+        public override ActionValidity GetActionValidity(Actor actor)
         {
             if (actor.Effects[Effect.Rooted] > 0) return ActionValidity.PreventedByEffect;
-            return base.GetActionValidity(mission, actor);
+            return base.GetActionValidity(actor);
         }
 
-        protected override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        protected override ActionValidity CheckTarget(Actor actor, ActionTarget target)
         {
+            var mission = actor.Mission;
             if (!mission.Connections[actor.Location, target.Location].CanMove) return ActionValidity.LocationNotAccessible;
             return ActionValidity.Valid;
         }
 
-        public override ActionResult Perform(Mission mission, Actor actor, ActionTarget target)
+        public override ActionResult Perform(Actor actor, ActionTarget target)
         {
-            if (GetSuccessChance(mission, actor, target) <= 0) throw new System.Exception("Invalid action.");
+            if (GetSuccessChance(actor, target) <= 0) throw new System.Exception("Invalid action.");
             actor.Location = target.Location;
             return new ActionResult(actor, this, target, true);
         }
@@ -137,27 +139,26 @@ namespace GRPG.GameLogic
             Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
         }
 
-        protected override ActionValidity CheckTarget(Mission mission, Actor actor, ActionTarget target)
+        protected override ActionValidity CheckTarget(Actor actor, ActionTarget target)
         {
             return target.Actor.Location == actor.Location ? ActionValidity.Valid : ActionValidity.OutOfRange;
         }
 
-        protected override int CalcSuccessChance(Mission mission, Actor actor, ActionTarget target)
+        protected override int CalcSuccessChance(Actor actor, ActionTarget target)
         {
             if (actor.Effects.Contains(Effect.SureHit)) return 100;
             if (target.Actor.Equals(actor)) return 99;
             return 50;
         }
 
-        public override ActionResult Perform(Mission mission, Actor actor, ActionTarget target)
+        public override ActionResult Perform(Actor actor, ActionTarget target)
         {
-            if (GetSuccessChance(mission, actor, target) <= 0) throw new System.Exception("Invalid action.");
-            var chance = GetSuccessChance(mission, actor, target);
+            var chance = GetSuccessChance(actor, target);
             var roll = Dice.Roll(100);
             var succ = roll <= chance;
             if (succ)
             {
-                mission.Actors.Remove(actor);
+                actor.Mission.Actors.Remove(actor);
             }
             return new ActionResult(actor, this, target, roll, chance, succ);
         }

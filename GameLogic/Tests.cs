@@ -57,7 +57,7 @@ namespace GRPG.GameLogic
             Mission.Start();
 
             // Player should have 2AP, monster 0AP
-            Assert.AreEqual(2, Player.Resources[Resource.PrimaryAction]);
+            Assert.AreEqual(1, Player.Resources[Resource.PrimaryAction]);
             Assert.AreEqual(0, Monster.Resources[Resource.PrimaryAction]);
 
             // Monster shouldn't be able to act on player turn
@@ -66,17 +66,23 @@ namespace GRPG.GameLogic
             // Player should have two available actions
             Assert.AreEqual(2, Player.GetAvailableActions().Count);
 
+            // Player should only be able to move to second location (#1)
+            var targets = Player.GetAvailableTargets(Action.Move);
+            Assert.AreEqual(1, targets.Count());
+            Assert.AreEqual(1, targets[0].Location);
+            Assert.IsNull(targets[0].Actor);
+
             // Move to the same square and punch out of existence.
-            Action.Move.Perform(Mission, Player, new ActionTarget(1));
+            Action.Move.Perform(Player, new ActionTarget(1));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Monster, new ActionTarget(4));
+            Action.Move.Perform(Monster, new ActionTarget(4));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Player, new ActionTarget(3));
+            Action.Move.Perform(Player, new ActionTarget(3));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Monster, new ActionTarget(3));
+            Action.Move.Perform(Monster, new ActionTarget(3));
 
             Monster.Effects.Add(Effect.SureHit, 1);
-            Action.Disintegrate.Perform(Mission, Monster, new ActionTarget(Player));
+            Action.Disintegrate.Perform(Monster, new ActionTarget(Player));
             Assert.AreEqual(1, Mission.Actors.Count);
         }
     }
