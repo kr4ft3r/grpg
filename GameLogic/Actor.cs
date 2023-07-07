@@ -49,8 +49,15 @@ namespace GRPG.GameLogic
 
         public List<ActionTarget> GetAvailableTargets(Action action)
         {
-            // var actors = Mission.Actors.Where(a => action.GetActionValidity(this, new ActionTarget(a)) == ActionValidity.Valid);
-            return new List<ActionTarget>();
+            List<ActionTarget> targets = Mission.Actors.Select(a => new ActionTarget(a)).Where(
+                at => action.GetActionValidity(this, at) == ActionValidity.Valid
+            ).ToList();
+            for (int i = 0; i < Mission.NumLocations; i++)
+            {
+                ActionTarget target = new ActionTarget(i);
+                if (action.GetActionValidity(this, target) == ActionValidity.Valid) targets.Add(target);
+            }
+            return targets;
         }
 
         internal void ApplyEffects()
