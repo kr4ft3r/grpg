@@ -26,14 +26,31 @@ namespace GRPG.GameLogic
         }
     }
 
-    public struct ActionResult
+    public class ActionResult
     {
         public Actor Actor;
-        public ActionTarget Target;
         public Action Action;
-        public int DiceRoll;
-        public int Difficulty;
+        public ActionTarget Target;
+        public int DiceRoll = -1;
+        public int Difficulty = -1;
         public bool IsSuccess;
+
+        public ActionResult(Actor actor, Action action, ActionTarget target, int roll, int diff, bool succ)
+        {
+            Actor = actor;
+            Action = action;
+            Target = target;
+            DiceRoll = roll;
+            Difficulty = diff;
+            IsSuccess = succ;
+        }
+        public ActionResult(Actor actor, Action action, ActionTarget target, bool succ)
+        {
+            Actor = actor;
+            Action = action;
+            Target = target;
+            IsSuccess = succ;
+        }
     }
 
     public abstract class Action
@@ -79,7 +96,7 @@ namespace GRPG.GameLogic
             return 100;
         }
 
-        public abstract void Perform(Mission mission, Actor actor, ActionTarget target);
+        public abstract ActionResult Perform(Mission mission, Actor actor, ActionTarget target);
     }
 
     public class ActionMove : Action
@@ -103,10 +120,11 @@ namespace GRPG.GameLogic
             return ActionValidity.Valid;
         }
 
-        public override void Perform(Mission mission, Actor actor, ActionTarget target)
+        public override ActionResult Perform(Mission mission, Actor actor, ActionTarget target)
         {
-            if (GetSuccessChance(mission, actor, target) <= 0) return;
+            if (GetSuccessChance(mission, actor, target) <= 0) throw new System.Exception("Invalid action.");
             actor.Location = target.Location;
+            return new ActionResult(actor, this, target, true);
         }
     }
 
@@ -131,15 +149,17 @@ namespace GRPG.GameLogic
             return 50;
         }
 
-        public override void Perform(Mission mission, Actor actor, ActionTarget target)
+        public override ActionResult Perform(Mission mission, Actor actor, ActionTarget target)
         {
+            if (GetSuccessChance(mission, actor, target) <= 0) throw new System.Exception("Invalid action.");
             var chance = GetSuccessChance(mission, actor, target);
             var roll = Dice.Roll(100);
-            System.Console.WriteLine("Rolling for " + chance + " -> " + roll);
-            if (roll <= chance)
+            var succ = roll <= chance;
+            if (succ)
             {
                 mission.Actors.Remove(actor);
             }
+            return new ActionResult(actor, this, target, roll, chance, succ);
         }
     }
 
