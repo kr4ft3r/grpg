@@ -42,10 +42,16 @@ namespace GRPG.GameLogic
 
         public List<Action> GetAvailableActions()
         {
-            return GetAllActions().Where(action => action.GetActionValidity(Mission, this) == ActionValidity.Valid).ToList();
+            return GetAllActions().Where(action => action.GetActionValidity(this) == ActionValidity.Valid).ToList();
         }
 
         public Action GetAction(string name) => GetAllActions().First(action => action.Name == name);
+
+        public List<ActionTarget> GetAvailableTargets(Action action)
+        {
+            // var actors = Mission.Actors.Where(a => action.GetActionValidity(this, new ActionTarget(a)) == ActionValidity.Valid);
+            return new List<ActionTarget>();
+        }
 
         internal void ApplyEffects()
         {

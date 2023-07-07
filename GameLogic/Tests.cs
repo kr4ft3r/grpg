@@ -67,16 +67,16 @@ namespace GRPG.GameLogic
             Assert.AreEqual(2, Player.GetAvailableActions().Count);
 
             // Move to the same square and punch out of existence.
-            Action.Move.Perform(Mission, Player, new ActionTarget(1));
+            Action.Move.Perform(Player, new ActionTarget(1));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Monster, new ActionTarget(4));
+            Action.Move.Perform(Monster, new ActionTarget(4));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Player, new ActionTarget(3));
+            Action.Move.Perform(Player, new ActionTarget(3));
             Mission.EndTurn();
-            Action.Move.Perform(Mission, Monster, new ActionTarget(3));
+            Action.Move.Perform(Monster, new ActionTarget(3));
 
             Monster.Effects.Add(Effect.SureHit, 1);
-            Action.Disintegrate.Perform(Mission, Monster, new ActionTarget(Player));
+            Action.Disintegrate.Perform(Monster, new ActionTarget(Player));
             Assert.AreEqual(1, Mission.Actors.Count);
         }
     }
