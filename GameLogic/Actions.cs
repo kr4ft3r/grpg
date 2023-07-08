@@ -158,7 +158,7 @@ namespace GRPG.GameLogic
             var succ = roll <= chance;
             if (succ)
             {
-                actor.Mission.Actors.Remove(actor);
+                actor.Mission.Actors.Remove(target.Actor);
             }
             actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
             return new ActionResult(actor, this, target, roll, chance, succ);
