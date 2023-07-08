@@ -34,6 +34,10 @@ namespace GRPG.GameLogic
         {
             foreach (var item in counts) this[item.Key] += item.Value;
         }
+        public void Substract(IEnumerable<KeyValuePair<T, int>> counts)
+        {
+            foreach (var item in counts) this[item.Key] -= item.Value;
+        }
         public void SetAll(IEnumerable<KeyValuePair<T, int>> counts)
         {
             foreach (var item in counts) this[item.Key] = item.Value;

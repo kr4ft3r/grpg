@@ -111,6 +111,7 @@ namespace GRPG.GameLogic
         {
             if (GetActionValidity(actor, target) != ActionValidity.Valid) throw new System.Exception("Invalid target.");
             var result = DoPerform(actor, target);
+            actor.Resources.Substract(this.Cost);
             actor.Mission.AfterActionPerformed(result);
             return result;
         }

@@ -73,6 +73,7 @@ namespace GRPG.GameLogic
 
             // Move to the same square
             Action.Move.Perform(Player, new ActionTarget(1));
+            Assert.IsFalse(Player.Resources.Contains(Resource.MoveAction));
             Mission.EndTurn();
             Action.Move.Perform(Monster, new ActionTarget(4));
             Mission.EndTurn();
