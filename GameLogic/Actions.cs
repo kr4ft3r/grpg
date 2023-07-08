@@ -77,6 +77,8 @@ namespace GRPG.GameLogic
 
         public ActionValidity GetActionValidity(Actor actor, ActionTarget target)
         {
+            var firstCheck = GetActionValidity(actor);
+            if (firstCheck != ActionValidity.Valid) return firstCheck;
             if (Constraint.HasFlag(TargetConstraint.Actor))
             {
                 if (target.Actor is null) return ActionValidity.WrongTargetType;
