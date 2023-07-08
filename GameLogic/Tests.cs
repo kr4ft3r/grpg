@@ -66,6 +66,7 @@ namespace GRPG.GameLogic
 
             // Player should only be able to move to second location (#1)
             var targets = Player.GetAvailableTargets(Action.Move);
+            Assert.AreEqual(0, Player.Location);
             Assert.AreEqual(1, targets.Count());
             Assert.AreEqual(1, targets[0].Location);
             Assert.IsNull(targets[0].Actor);

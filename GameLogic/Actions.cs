@@ -55,12 +55,13 @@ namespace GRPG.GameLogic
 
     public abstract class Action
     {
+        public static TargetConstraint SelfOnly = TargetConstraint.Actor | TargetConstraint.Self;
         public static Action Move = new ActionMove();
         public static Action Disintegrate = new ActionDisintegrate();
 
         public string Name { get; protected set; }
         public CounterDict<Resource> Cost { get; protected set; }
-        public TargetType TargetType { get; protected set; }
+        public TargetConstraint Constraint { get; protected set; }
 
         public virtual ActionValidity GetActionValidity(Actor actor)
         {
@@ -76,8 +77,27 @@ namespace GRPG.GameLogic
 
         public ActionValidity GetActionValidity(Actor actor, ActionTarget target)
         {
-            if (TargetType == TargetType.Actor && target.Actor is null) return ActionValidity.WrongTargetType;
-            if (TargetType == TargetType.Location && target.Location < 0) return ActionValidity.WrongTargetType;
+            if (Constraint.HasFlag(TargetConstraint.Actor))
+            {
+                if (target.Actor is null) return ActionValidity.WrongTargetType;
+                var enemyTeam = actor.Team == Team.Human ? Team.AI : Team.Human;
+                var targetingSelf = actor.Equals(target.Actor);
+                var conn = actor.Mission.Connections[actor.Location, target.Actor.Location];
+                if (!conn.CanSee) return ActionValidity.LocationNotAccessible;
+                if (!conn.CanMove && Constraint.HasFlag(TargetConstraint.NeighbourOnly)) return ActionValidity.LocationNotAccessible;
+                if (targetingSelf && !Constraint.HasFlag(TargetConstraint.Self)) return ActionValidity.CannotTargetSelf;
+                if (!targetingSelf && Constraint == SelfOnly) return ActionValidity.OnlyTargetSelf;
+                if (target.Actor.Team == actor.Team && !targetingSelf && !Constraint.HasFlag(TargetConstraint.Ally)) return ActionValidity.TargetOnWrongTeam;
+                if (target.Actor.Team == enemyTeam && !Constraint.HasFlag(TargetConstraint.Enemy)) return ActionValidity.TargetOnWrongTeam;
+                if (actor.Location != target.Actor.Location && Constraint.HasFlag(TargetConstraint.OwnLocationOnly)) return ActionValidity.OwnLocationOnly;
+            } 
+            if (Constraint.HasFlag(TargetConstraint.Location))
+            {
+                if (target.Location < 0) return ActionValidity.WrongTargetType;
+                var conn = actor.Mission.Connections[actor.Location, target.Location];
+                if (!conn.CanSee) return ActionValidity.LocationNotAccessible;
+                if (!conn.CanMove && Constraint.HasFlag(TargetConstraint.NeighbourOnly)) return ActionValidity.LocationNotAccessible;
+            }  
             return CheckTarget(actor, target);
         }
 
@@ -85,6 +105,14 @@ namespace GRPG.GameLogic
         {
             if (GetActionValidity(actor, target) != ActionValidity.Valid) return -1;
             return CalcSuccessChance(actor, target);
+        }
+
+        public ActionResult Perform(Actor actor, ActionTarget target)
+        {
+            if (GetActionValidity(actor, target) != ActionValidity.Valid) throw new System.Exception("Invalid target.");
+            var result = DoPerform(actor, target);
+            actor.Mission.AfterActionPerformed(result);
+            return result;
         }
 
         protected virtual ActionValidity CheckTarget(Actor actor, ActionTarget target)
@@ -97,7 +125,7 @@ namespace GRPG.GameLogic
             return 100;
         }
 
-        public abstract ActionResult Perform(Actor actor, ActionTarget target);
+        protected abstract ActionResult DoPerform(Actor actor, ActionTarget target);
     }
 
     public class ActionMove : Action
@@ -105,7 +133,8 @@ namespace GRPG.GameLogic
         public ActionMove()
         {
             Name = "Move";
-            TargetType = TargetType.Location;
+            Constraint = TargetConstraint.Location | TargetConstraint.NeighbourOnly;
+            FFS.Log("Move: {0}", Constraint);
             Cost = new CounterDict<Resource>(Resource.MoveAction, 1);
         }
 
@@ -115,16 +144,8 @@ namespace GRPG.GameLogic
             return base.GetActionValidity(actor);
         }
 
-        protected override ActionValidity CheckTarget(Actor actor, ActionTarget target)
+        protected override ActionResult DoPerform(Actor actor, ActionTarget target)
         {
-            var mission = actor.Mission;
-            if (!mission.Connections[actor.Location, target.Location].CanMove) return ActionValidity.LocationNotAccessible;
-            return ActionValidity.Valid;
-        }
-
-        public override ActionResult Perform(Actor actor, ActionTarget target)
-        {
-            if (GetSuccessChance(actor, target) <= 0) throw new System.Exception("Invalid action.");
             actor.Location = target.Location;
             return new ActionResult(actor, this, target, true);
         }
@@ -135,23 +156,17 @@ namespace GRPG.GameLogic
         public ActionDisintegrate()
         {
             Name = "Disintegrating Punch";
-            TargetType = TargetType.Actor;
+            Constraint = TargetConstraint.Actor | TargetConstraint.Enemy | TargetConstraint.OwnLocationOnly;
             Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
-        }
-
-        protected override ActionValidity CheckTarget(Actor actor, ActionTarget target)
-        {
-            return target.Actor.Location == actor.Location ? ActionValidity.Valid : ActionValidity.OutOfRange;
         }
 
         protected override int CalcSuccessChance(Actor actor, ActionTarget target)
         {
             if (actor.Effects.Contains(Effect.SureHit)) return 100;
-            if (target.Actor.Equals(actor)) return 99;
             return 50;
         }
 
-        public override ActionResult Perform(Actor actor, ActionTarget target)
+        protected override ActionResult DoPerform(Actor actor, ActionTarget target)
         {
             var chance = GetSuccessChance(actor, target);
             var roll = Dice.Roll(100);
