@@ -69,6 +69,13 @@ namespace GRPG.GameLogic
                     Connections[i, j] = new Connection(graph[i, j]);
         }
 
+        public Actor CreateActor(string name, CharacterStats stats, Team team, int location)
+        {
+            var actor = new Actor(this, name, stats, team, location);
+            Actors.Add(actor);
+            return actor;
+        }
+
         public void Start()
         {
             TurnNumber += 1;

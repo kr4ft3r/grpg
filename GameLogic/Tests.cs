@@ -38,10 +38,8 @@ namespace GRPG.GameLogic
         public void InitTest()
         {
             Mission = new Mission(Graph);
-            Player = new Actor(Mission, "Player", new CharacterStats(), Team.Human, 0);
-            Monster = new Actor(Mission, "Monster", new CharacterStats(), Team.AI, 5);
-            Mission.Actors.Add(Player);
-            Mission.Actors.Add(Monster);
+            Player = Mission.CreateActor("Player", new CharacterStats(), Team.Human, 0);
+            Monster = Mission.CreateActor("Monster", new CharacterStats(), Team.AI, 5);
         }
 
         [TestMethod]
