@@ -6,7 +6,7 @@ namespace GRPG.GameLogic
 {
     public class CharacterStats
     {
-        public List<Action> Actions = new List<Action> { Action.Move, Action.Disintegrate };
+        public List<Action> Actions = new List<Action> { Action.Move, Action.Punch };
         public CounterDict<Resource> PerBattleResources = new CounterDict<Resource>();
         public CounterDict<Resource> PerTurnResources = new CounterDict<Resource> {
             {Resource.PrimaryAction, 1},
@@ -78,8 +78,8 @@ namespace GRPG.GameLogic
         internal void NewTurn()
         {
             Resources.SetAll(Stats.PerTurnResources);
-            Effects.DecrementAll();
             ApplyEffects();
+            Effects.DecrementAll();
         }
     }
 

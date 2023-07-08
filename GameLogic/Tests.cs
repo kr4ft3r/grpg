@@ -71,7 +71,7 @@ namespace GRPG.GameLogic
             Assert.AreEqual(1, targets[0].Location);
             Assert.IsNull(targets[0].Actor);
 
-            // Move to the same square and punch out of existence.
+            // Move to the same square
             Action.Move.Perform(Player, new ActionTarget(1));
             Mission.EndTurn();
             Action.Move.Perform(Monster, new ActionTarget(4));
@@ -80,9 +80,15 @@ namespace GRPG.GameLogic
             Mission.EndTurn();
             Action.Move.Perform(Monster, new ActionTarget(3));
 
+            // Punch the player
             Monster.Effects.Add(Effect.SureHit, 1);
-            Action.Disintegrate.Perform(Monster, new ActionTarget(Player));
-            Assert.AreEqual(1, Mission.Actors.Count);
+            Action.Punch.Perform(Monster, new ActionTarget(Player));
+            Assert.IsTrue(Player.Effects.Contains(Effect.Stunned));
+            Mission.EndTurn();
+
+            // Player should have no AP and lose the stun effect
+            Assert.IsFalse(Player.Effects.Contains(Effect.Stunned));
+            Assert.AreEqual(0, Player.Resources[Resource.PrimaryAction]);
         }
     }
 }

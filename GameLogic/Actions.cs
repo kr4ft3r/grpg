@@ -57,7 +57,7 @@ namespace GRPG.GameLogic
     {
         public static TargetConstraint SelfOnly = TargetConstraint.Actor | TargetConstraint.Self;
         public static Action Move = new ActionMove();
-        public static Action Disintegrate = new ActionDisintegrate();
+        public static Action Punch = new ActionPunch();
 
         public string Name { get; protected set; }
         public CounterDict<Resource> Cost { get; protected set; }
@@ -151,11 +151,11 @@ namespace GRPG.GameLogic
         }
     }
 
-    public class ActionDisintegrate : Action
+    public class ActionPunch : Action
     {
-        public ActionDisintegrate()
+        public ActionPunch()
         {
-            Name = "Disintegrating Punch";
+            Name = "Punch";
             Constraint = TargetConstraint.Actor | TargetConstraint.Enemy | TargetConstraint.OwnLocationOnly;
             Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
         }
@@ -173,7 +173,7 @@ namespace GRPG.GameLogic
             var succ = roll <= chance;
             if (succ)
             {
-                actor.Mission.Actors.Remove(target.Actor);
+                target.Actor.Effects.Add(Effect.Stunned, 1);
             }
             actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
             return new ActionResult(actor, this, target, roll, chance, succ);
