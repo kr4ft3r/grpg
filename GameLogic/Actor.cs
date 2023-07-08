@@ -21,6 +21,7 @@ namespace GRPG.GameLogic
         public CharacterStats Stats;
         public Mission Mission;
         public Team Team;
+        public ActorStatus Status = ActorStatus.Active;
         public int Location {
             get { return _location; }
             set {

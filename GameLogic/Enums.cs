@@ -55,4 +55,11 @@ namespace GRPG.GameLogic
         TargetOnWrongTeam,
         PreventedByEffect
     }
+
+    public enum ActorStatus
+    {
+        Active,
+        Inactive,
+        Downed
+    }
 }
