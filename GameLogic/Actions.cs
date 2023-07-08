@@ -160,6 +160,7 @@ namespace GRPG.GameLogic
             {
                 actor.Mission.Actors.Remove(actor);
             }
+            actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
             return new ActionResult(actor, this, target, roll, chance, succ);
         }
     }

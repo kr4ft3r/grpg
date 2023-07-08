@@ -49,4 +49,12 @@ namespace GRPG.GameLogic
         private static System.Random _rnd = new System.Random();
         public static int Roll(int numSides) => _rnd.Next(numSides) + 1;
     }
+
+    public static class FFS
+    {
+        public static void Log(string format, params object[] arg)
+        {
+            System.Console.WriteLine(format, arg);
+        }
+    }
 }

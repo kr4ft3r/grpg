@@ -16,11 +16,19 @@ namespace GRPG.GameLogic
 
     public class Actor
     {
+        protected int _location = -1;
         public string Name;
         public CharacterStats Stats;
         public Mission Mission;
         public Team Team;
-        public int Location;
+        public int Location {
+            get { return _location; }
+            set {
+                int old = _location;
+                _location = value;
+                if (Mission.IsActive) Mission.AfterActorMoves(this, old, value);
+            }
+        }
 
         public CounterDict<Resource> Resources = new CounterDict<Resource>();
         public CounterDict<Effect> Effects = new CounterDict<Effect>();

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace GRPG.GameLogic
 {
@@ -24,7 +25,11 @@ namespace GRPG.GameLogic
             if (props.Contains('M')) CanMove = true;
             if (props.Contains('C')) HasCover = true;
         }
-    };
+    }
+
+    public delegate void ActionPerformedDelegate(ActionResult result);
+    public delegate void ActorHasMovedDelegate(Actor actor, int from, int to);
+    public delegate void ActorHasAttackedDelegate(Actor actor, Actor target, bool success);
 
     public class Mission
     {
@@ -34,12 +39,21 @@ namespace GRPG.GameLogic
         public List<Team> Teams = new List<Team>();
         public int TurnNumber { get; private set; }
         public int CurrentTeamIndex { get; private set; }
+        public bool IsActive { get { return TurnNumber > 0; } }
 
         public Team CurrentTeam { get { return Teams[CurrentTeamIndex]; } }
         public IEnumerable<Actor> GetTeamMembers(Team team) => Actors.Where(a => a.Team == team);
 
+        // Events
+        public ActionPerformedDelegate AfterActionPerformed;
+        public ActorHasMovedDelegate AfterActorMoves;
+        public ActorHasAttackedDelegate AfterActorAttacks;
+
         public Mission(string[,] graph)
         {
+            AfterActionPerformed = HandleAction;
+            AfterActorMoves = HandleMove;
+            AfterActorAttacks = HandleAttack;
             MakeGraph(graph);
             Teams.Add(Team.Human);
             Teams.Add(Team.AI);
@@ -55,9 +69,16 @@ namespace GRPG.GameLogic
                     Connections[i, j] = new Connection(graph[i, j]);
         }
 
+        public Actor CreateActor(string name, CharacterStats stats, Team team, int location)
+        {
+            var actor = new Actor(this, name, stats, team, location);
+            Actors.Add(actor);
+            return actor;
+        }
+
         public void Start()
         {
-            // TODO: Add mission status enum
+            TurnNumber += 1;
             foreach (var actor in this.GetTeamMembers(CurrentTeam)) actor.NewTurn();
         }
 
@@ -69,6 +90,21 @@ namespace GRPG.GameLogic
                 TurnNumber += 1;
             }
             foreach (var actor in this.GetTeamMembers(CurrentTeam)) actor.NewTurn();
+        }
+
+        protected void HandleMove(Actor actor, int from, int to)
+        {
+            FFS.Log("Moved: {0} {1}->{2}", actor.Name, from, to);
+        }
+
+        protected void HandleAttack(Actor actor, Actor target, bool success)
+        {
+            FFS.Log("Attacked: {0} -> {1} ({2})", actor.Name, target.Name, success);
+        }
+
+        protected void HandleAction(ActionResult result)
+        {
+            FFS.Log("Action: {0}", result.Action.Name);
         }
     }
 
