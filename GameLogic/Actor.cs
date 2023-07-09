@@ -4,21 +4,12 @@ using System.Linq;
 
 namespace GRPG.GameLogic
 {
-    public class CharacterStats
-    {
-        public List<Action> Actions = new List<Action> { Action.Move, Action.Punch };
-        public CounterDict<Resource> PerBattleResources = new CounterDict<Resource>();
-        public CounterDict<Resource> PerTurnResources = new CounterDict<Resource> {
-            {Resource.PrimaryAction, 1},
-            {Resource.MoveAction, 1},
-        };
-    }
-
     public class Actor
     {
         protected int _location = -1;
         public string Name;
-        public CharacterStats Stats;
+        public Character Character;
+        public CharacterStats Stats { get { return Character.Stats; } }
         public Mission Mission;
         public Team Team;
         public ActorStatus Status = ActorStatus.Active;
@@ -34,13 +25,13 @@ namespace GRPG.GameLogic
         public CounterDict<Resource> Resources = new CounterDict<Resource>();
         public CounterDict<Effect> Effects = new CounterDict<Effect>();
 
-        public Actor(Mission mission, string name, CharacterStats stats, Team team, int location)
+        public Actor(Mission mission, string name, Character character, Team team, int location)
         {
             Mission = mission;
             Name = name;
-            Stats = stats;
             Team = team;
             Location = location;
+            Character = character;
             Resources.SetAll(Stats.PerBattleResources);
         }
 
