@@ -15,21 +15,14 @@ namespace GRPG.GameLogic
         public int this[T key]  
         {  
             get { return _counts.ContainsKey(key) ? _counts[key] : 0; }  
-            set { 
-                if (value <= 0)
-                {
-                    if (_counts.ContainsKey(key)) _counts.Remove(key);
-                    return;
-                }
-                if (!_counts.ContainsKey(key)) _counts.Add(key, value);
-                else _counts[key] = value;               
-            }  
+            set { _counts[key] = value <= 0 ? 0 : value; }  
         } 
         public IEnumerator<KeyValuePair<T, int>> GetEnumerator() => _counts.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => _counts.GetEnumerator();
 
-        public bool Contains(T key) => _counts.ContainsKey(key);
+        public bool Contains(T key) => this[key] > 0;
         public void Add(T key, int count) => this[key] += count;
+
         public void Add(IEnumerable<KeyValuePair<T, int>> counts)
         {
             foreach (var item in counts) this[item.Key] += item.Value;
@@ -44,7 +37,15 @@ namespace GRPG.GameLogic
         }
         public void DecrementAll()
         {
-            foreach (var item in this) this[item.Key] -= 1;
+            foreach (var key in _counts.Keys.ToArray()) this[key] -= 1;
+        }
+        public bool Contains(IEnumerable<KeyValuePair<T, int>> counts)
+        {
+            foreach (var item in counts)
+            {
+                if (this[item.Key] < item.Value) return false;
+            }
+            return true;
         }
     }
     

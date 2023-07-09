@@ -66,12 +66,8 @@ namespace GRPG.GameLogic
         public virtual ActionValidity GetActionValidity(Actor actor)
         {
             var mission = actor.Mission;
-            // Might change this to return a reason for being unable to perform action.
             if (mission.CurrentTeam != actor.Team) return ActionValidity.NotMyTurn;
-            foreach (var item in Cost)
-            {
-                if (actor.Resources[item.Key] < item.Value) return ActionValidity.NotEnoughResources;
-            }
+            if (!actor.Resources.Contains(this.Cost)) return ActionValidity.NotEnoughResources;
             return ActionValidity.Valid;
         }
 
