@@ -25,7 +25,7 @@ namespace GRPG.GameLogic
             {"SMx", "Sxx", "SMx", "SMx", "SxC", "xxx"},
             {"xxx", "SMC", "Sxx", "Sxx", "SMC", "xxx"},
             {"xxx", "SMC", "Sxx", "Sxx", "SMC", "xxx"},
-            {"xxx", "SxC", "SMx", "SMx", "Sxx", "xxx"},
+            {"xxx", "SxC", "SMx", "SMx", "Sxx", "SMx"},
             {"xxx", "xxx", "xxx", "xxx", "SMx", "Sxx"},
         };
 
@@ -40,6 +40,24 @@ namespace GRPG.GameLogic
             Mission = new Mission(Graph);
             Player = Mission.CreateActor("Player", new CharacterStats(), Team.Human, 0);
             Monster = Mission.CreateActor("Monster", new CharacterStats(), Team.AI, 5);
+        }
+
+        [TestMethod]
+        public void PathfinderTest()
+        {
+            // Should not return self
+            Assert.AreEqual(0, Util.GetPathToActorsOnTeam(Player, Team.Human).Count);
+
+            // Should get {Monster: [1, 2 or 3, 4, 5]}
+            var paths = Util.GetPathToActorsOnTeam(Player, Team.AI);
+            Assert.AreEqual(1, paths.Count);
+            Assert.IsTrue(paths.ContainsKey(Monster));
+            var path = paths[Monster];
+            Assert.AreEqual(4, path.Count);     // 4 hops
+            Assert.AreEqual(1, path[0]);        // 1st hop to node #1
+            Assert.IsTrue(path[1] < 4);         // 2nd hop to node #2 or #3
+            Assert.AreEqual(4, path[2]);        // 3rd hop to node #4
+            Assert.AreEqual(5, path[3]);        // 4th hop to node #5
         }
 
         [TestMethod]

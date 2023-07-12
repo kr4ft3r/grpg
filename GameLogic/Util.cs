@@ -55,6 +55,62 @@ namespace GRPG.GameLogic
         public static int Roll(int numSides) => _rnd.Next(numSides) + 1;
     }
 
+    public static class Util
+    {
+        public static List<int> GetNeighbours(Mission mission, int location)
+        {
+            var result = new List<int>();
+            for (int i = 0; i < mission.NumLocations; i++)
+            {
+                if (mission.Connections[location, i].CanMove) result.Add(i);
+            }
+            return result;
+        }
+        public static List<int> GetNeighbours(Actor actor) 
+            => GetNeighbours(actor.Mission, actor.Location);
+        public static List<Actor> GetActors(Mission mission, int location, Team team) 
+            => mission.Actors.Where(a => a.Location == location && a.Team == team).ToList();
+
+        public static Dictionary<Actor, List<int>> GetPathToActorsOnTeam(Actor actor, Team team)
+        {
+            var sorted = new Dictionary<int, List<int>>();
+            var next = new Dictionary<int, List<int>>();
+
+            // Start from actor's location
+            sorted.Add(actor.Location, new List<int>());
+            next.Add(actor.Location, new List<int>());
+
+            // Loop while there is more locations to be added to _sorted
+            while (next.Count > 0)
+            {
+                // Keep track of what we added to _sorted so we can traverse BFS
+                var newlyAdded = new Dictionary<int, List<int>>();
+
+                // Go through the next set of nodes (with their paths in the dict)
+                foreach (var item in next)
+                {
+                    // Add each non-visited child and its path to _sorted and newlyAdded
+                    foreach (var child in Util.GetNeighbours(actor.Mission, item.Key))
+                    {
+                        if (sorted.ContainsKey(child)) continue;
+                        var path = item.Value.ToList();
+                        path.Add(child);
+                        sorted.Add(child, path);
+                        newlyAdded.Add(child, path);
+                    }
+                }
+                next = newlyAdded;
+            }
+
+            // Get the result from sorted nodes
+            var result = new Dictionary<Actor, List<int>>();
+            foreach (var locpath in sorted)
+                foreach (var a in GetActors(actor.Mission, locpath.Key, team).Where(a => !a.Equals(actor) && a.Team == team))
+                    result.Add(a, locpath.Value);
+            return result;
+        }
+   }
+
     public static class FFS
     {
         public static void Log(string format, params object[] arg)
