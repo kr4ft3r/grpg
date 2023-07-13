@@ -7,6 +7,7 @@ namespace GRPG.GameLogic
 {
     public enum Resource
     {
+        HitPoints,
         PrimaryAction,  // We'll only use these 1st iteration
         SecondaryAction,
         MoveAction,
@@ -53,7 +54,8 @@ namespace GRPG.GameLogic
         OnlyTargetSelf,
         CannotTargetSelf,
         TargetOnWrongTeam,
-        PreventedByEffect
+        PreventedByEffect,
+        NoEnemies
     }
 
     public enum ActorStatus
