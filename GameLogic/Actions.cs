@@ -56,6 +56,7 @@ namespace GRPG.GameLogic
     public abstract class Action
     {
         public static TargetConstraint SelfOnly = TargetConstraint.Actor | TargetConstraint.Self;
+        public static Action Null = new NullAction();
         public static Action Move = new ActionMove();
         public static Action Punch = new ActionPunch();
 
@@ -114,6 +115,11 @@ namespace GRPG.GameLogic
             return result;
         }
 
+        public virtual bool IsNull()
+        {
+            return false;
+        }
+
         protected virtual ActionValidity CheckTarget(Actor actor, ActionTarget target)
         {
             return ActionValidity.Valid;
@@ -125,6 +131,22 @@ namespace GRPG.GameLogic
         }
 
         protected abstract ActionResult DoPerform(Actor actor, ActionTarget target);
+    }
+
+    public class NullAction : Action
+    {
+        public NullAction()
+        {
+            Name = "NULL";
+        }
+        public override bool IsNull()
+        {
+            return true;
+        }
+        protected override ActionResult DoPerform(Actor actor, ActionTarget target)
+        {
+            return new ActionResult(actor, this, target, true);
+        }
     }
 
     public class ActionMove : Action
