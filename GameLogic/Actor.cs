@@ -69,6 +69,22 @@ namespace GRPG.GameLogic
             return targets;
         }
 
+        public void TakeDamage(int amount)
+        {
+            Damage damage = new Damage(this, amount);
+            if(Mission.ActorIsDamaged != null) Mission.ActorIsDamaged(damage);
+            damage.Apply();
+            if(Mission.PostActorIsDamaged != null) Mission.PostActorIsDamaged(this, damage.DamageAmount);
+        }
+
+        public void TakeDamage(Actor attacker, Action action, int amount)
+        {
+            Damage damage = new Damage(this, amount);
+            Mission.ActorIsDamaged(new Damage(this, attacker, action, amount));
+            damage.Apply();
+            Mission.PostActorIsDamaged(this, damage.DamageAmount);
+        }
+
         internal void ApplyEffects()
         {
             if (Effects.Contains(Effect.Hasted)) Resources.Add(Resource.PrimaryAction, 1);
@@ -80,7 +96,10 @@ namespace GRPG.GameLogic
             Resources.SetAll(Stats.PerTurnResources);
             ApplyEffects();
             Effects.DecrementAll();
+            if(PostActorNewTurn != null) PostActorNewTurn(this);
         }
+
+        public PostActorNewTurnDelegate PostActorNewTurn;
     }
 
 }

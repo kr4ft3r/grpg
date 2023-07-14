@@ -195,6 +195,7 @@ namespace GRPG.GameLogic
             if (succ)
             {
                 target.Actor.Effects.Add(Effect.Stunned, 1);
+                target.Actor.TakeDamage(Dice.Roll(12));
             }
             actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
             return new ActionResult(actor, this, target, roll, chance, succ);

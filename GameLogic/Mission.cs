@@ -27,9 +27,16 @@ namespace GRPG.GameLogic
         }
     }
 
+    // Modifier events
+    public delegate void ActorIsDamagedDelegate(Damage damage);
+    // Post modifier events (for presentation)
+    public delegate void PostActorIsDamagedDelegate(Actor victim, int damage);
+    // Post action events
     public delegate void ActionPerformedDelegate(ActionResult result);
     public delegate void ActorHasMovedDelegate(Actor actor, int from, int to);
     public delegate void ActorHasAttackedDelegate(Actor actor, Actor target, bool success);
+
+    public delegate void PostActorNewTurnDelegate(Actor actor);
 
     public class Mission
     {
@@ -44,7 +51,11 @@ namespace GRPG.GameLogic
         public Team CurrentTeam { get { return Teams[CurrentTeamIndex]; } }
         public IEnumerable<Actor> GetTeamMembers(Team team) => Actors.Where(a => a.Team == team);
 
-        // Events
+        // Modifier events
+        public ActorIsDamagedDelegate ActorIsDamaged;
+        // Post modifier events
+        public PostActorIsDamagedDelegate PostActorIsDamaged;
+        // Post action events
         public ActionPerformedDelegate AfterActionPerformed;
         public ActorHasMovedDelegate AfterActorMoves;
         public ActorHasAttackedDelegate AfterActorAttacks;
