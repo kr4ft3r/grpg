@@ -30,7 +30,7 @@ namespace GRPG.GameLogic
     // Modifier events
     public delegate void ActorIsDamagedDelegate(Damage damage);
     // Post modifier events (for presentation)
-    public delegate void PostActorIsDamagedDelegate(Actor victim, int damage);
+    public delegate void PostActorIsDamagedDelegate(Actor victim, Damage damage);
     // Post action events
     public delegate void ActionPerformedDelegate(ActionResult result);
     public delegate void ActorHasMovedDelegate(Actor actor, int from, int to);

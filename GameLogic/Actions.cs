@@ -197,9 +197,9 @@ namespace GRPG.GameLogic
             if (succ)
             {
                 target.Actor.Effects.Add(Effect.Stunned, 1);
-                target.Actor.TakeDamage(Dice.Roll(12));
+                target.Actor.TakeDamage(actor, this, Dice.Roll(12));
             }
-            actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
+            if(actor.Mission.AfterActorAttacks != null) actor.Mission.AfterActorAttacks(actor, target.Actor, succ);
             return new ActionResult(actor, this, target, roll, chance, succ);
         }
     }

@@ -74,15 +74,15 @@ namespace GRPG.GameLogic
             Damage damage = new Damage(this, amount);
             if(Mission.ActorIsDamaged != null) Mission.ActorIsDamaged(damage);
             damage.Apply();
-            if(Mission.PostActorIsDamaged != null) Mission.PostActorIsDamaged(this, damage.DamageAmount);
+            if(Mission.PostActorIsDamaged != null) Mission.PostActorIsDamaged(this, damage);
         }
 
         public void TakeDamage(Actor attacker, Action action, int amount)
         {
-            Damage damage = new Damage(this, amount);
-            Mission.ActorIsDamaged(new Damage(this, attacker, action, amount));
+            Damage damage = new Damage(this, attacker, action, amount);
+            if (Mission.ActorIsDamaged != null) Mission.ActorIsDamaged(damage);
             damage.Apply();
-            Mission.PostActorIsDamaged(this, damage.DamageAmount);
+            if (Mission.PostActorIsDamaged != null) Mission.PostActorIsDamaged(this, damage);
         }
 
         internal void ApplyEffects()
