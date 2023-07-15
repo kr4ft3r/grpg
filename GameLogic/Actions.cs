@@ -79,6 +79,7 @@ namespace GRPG.GameLogic
             if (Constraint.HasFlag(TargetConstraint.Actor))
             {
                 if (target.Actor is null) return ActionValidity.WrongTargetType;
+                if (target.Actor.Status == ActorStatus.Downed) return ActionValidity.WrongTargetType;//TODO bad validity return
                 var enemyTeam = actor.Team == Team.Human ? Team.AI : Team.Human;
                 var targetingSelf = actor.Equals(target.Actor);
                 var conn = actor.Mission.Connections[actor.Location, target.Actor.Location];

@@ -105,7 +105,9 @@ namespace GRPG.GameLogic
             // Get the result from sorted nodes
             var result = new Dictionary<Actor, List<int>>();
             foreach (var locpath in sorted)
-                foreach (var a in GetActors(actor.Mission, locpath.Key, team).Where(a => !a.Equals(actor) && a.Team == team))
+                foreach (var a in GetActors(actor.Mission, locpath.Key, team)
+                    .Where(a => a.Status != ActorStatus.Downed)
+                    .Where(a => !a.Equals(actor) && a.Team == team))
                     result.Add(a, locpath.Value);
             return result;
         }

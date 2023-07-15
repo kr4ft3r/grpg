@@ -35,7 +35,9 @@ namespace GRPG.GameLogic
     public delegate void ActionPerformedDelegate(ActionResult result);
     public delegate void ActorHasMovedDelegate(Actor actor, int from, int to);
     public delegate void ActorHasAttackedDelegate(Actor actor, Actor target, bool success);
-
+    //
+    public delegate void ActorWasDownedDelegate(Actor actor);
+    // Actor object events
     public delegate void PostActorNewTurnDelegate(Actor actor);
 
     public class Mission
@@ -49,7 +51,8 @@ namespace GRPG.GameLogic
         public bool IsActive { get { return TurnNumber > 0; } }
 
         public Team CurrentTeam { get { return Teams[CurrentTeamIndex]; } }
-        public IEnumerable<Actor> GetTeamMembers(Team team) => Actors.Where(a => a.Team == team);
+        public IEnumerable<Actor> GetTeamMembers(Team team) => Actors.Where(a => a.Team == team)
+            .Where(a => a.Status != ActorStatus.Downed);
 
         // Modifier events
         public ActorIsDamagedDelegate ActorIsDamaged;
@@ -59,6 +62,8 @@ namespace GRPG.GameLogic
         public ActionPerformedDelegate AfterActionPerformed;
         public ActorHasMovedDelegate AfterActorMoves;
         public ActorHasAttackedDelegate AfterActorAttacks;
+        //
+        public ActorWasDownedDelegate ActorWasDowned;
 
         public Mission(string[,] graph)
         {

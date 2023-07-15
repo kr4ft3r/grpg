@@ -59,7 +59,11 @@ public class Damage
         int hp = Victim.Resources[Resource.HitPoints];
         hp = System.Math.Clamp(hp - DamageAmount, 0, Victim.Stats.PerBattleResources[Resource.HitPoints]);
 
-        if (hp == 0) Victim.Status = ActorStatus.Downed; // TODO onactorkilled event
+        if (hp == 0 && Victim.Status != ActorStatus.Downed) {
+            Victim.Status = ActorStatus.Downed; // TODO onactorkilled event
+            //No.. do not. Victim.Location = -1;
+            if (Victim.Mission.ActorWasDowned != null) Victim.Mission.ActorWasDowned(Victim);
+        }
         Victim.Resources[Resource.HitPoints] = hp;
     }
     
