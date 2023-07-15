@@ -44,6 +44,22 @@ namespace GRPG.GameLogic
             Resources.SetAll(Stats.PerBattleResources);
         }
 
+        public bool HasActionEquipped(Action action) // Solve instancing issue
+        {
+            return HasActionEquipped(action.Name);
+        }
+
+        public bool HasActionEquipped(string actionName)
+        {
+            //return Stats.Actions.Select(a => a.Name == actionName).DefaultIfEmpty(false).First();
+            foreach (Action action in Stats.Actions)
+            {
+                if (action.Name == actionName) return true;
+            }
+
+            return false;
+        }
+
         public List<Action> GetAllActions()
         {
             return new List<Action>(Stats.Actions);
