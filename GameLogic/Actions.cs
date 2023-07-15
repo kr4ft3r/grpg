@@ -96,6 +96,7 @@ namespace GRPG.GameLogic
                 var conn = actor.Mission.Connections[actor.Location, target.Location];
                 if (!conn.CanSee) return ActionValidity.LocationNotAccessible;
                 if (!conn.CanMove && Constraint.HasFlag(TargetConstraint.NeighbourOnly)) return ActionValidity.LocationNotAccessible;
+                if (actor.Location != target.Location && Constraint.HasFlag(TargetConstraint.OwnLocationOnly)) return ActionValidity.OwnLocationOnly;
             }  
             return CheckTarget(actor, target);
         }
