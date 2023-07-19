@@ -135,18 +135,18 @@ public class MissionMain : MonoBehaviour
 
                 if (result.IsSuccess)
                 {
-                    if ((sequencer.TimeElapsed / lerpDuration) >= 0.1f && !sequencer.IsStringSet("step1"))
+                    if ((sequencer.TimeElapsed / lerpDuration) >= 0.1f && !sequencer.Vars.IsStringSet("step1"))
                     {
                         sequencer.ActorPlaySound(result.Actor, sequencer.PerformSoundPath, .4f);
-                        sequencer.SetString("step1", "1");
-                    } else if ((sequencer.TimeElapsed / lerpDuration) >= 0.4f && !sequencer.IsStringSet("step2"))
+                        sequencer.Vars.SetString("step1", "1");
+                    } else if ((sequencer.TimeElapsed / lerpDuration) >= 0.4f && !sequencer.Vars.IsStringSet("step2"))
                     {
                         sequencer.ActorPlaySound(result.Actor, sequencer.PerformSoundPath, .3f);
-                        sequencer.SetString("step2", "2");
-                    } else if ((sequencer.TimeElapsed / lerpDuration) >= 0.7f && !sequencer.IsStringSet("step3"))
+                        sequencer.Vars.SetString("step2", "2");
+                    } else if ((sequencer.TimeElapsed / lerpDuration) >= 0.7f && !sequencer.Vars.IsStringSet("step3"))
                     {
                         sequencer.ActorPlaySound(result.Actor, sequencer.PerformSoundPath, .15f);
-                        sequencer.SetString("step3", "3");
+                        sequencer.Vars.SetString("step3", "3");
                     }
                 } else
                 {
@@ -157,14 +157,14 @@ public class MissionMain : MonoBehaviour
                 Vector3 locationPos = sceneObjects.GetLocationSlotPositionByIndex(result.Target.Location);
                 // TODO LerpTo function
                 Vector3 lerpedPos;
-                if (!sequencer.IsPositionSet("actorStart"))
+                if (!sequencer.Vars.IsVectorSet("actorStart"))
                 {
-                    sequencer.SetPosition("actorStart", actorGO.transform.position);
+                    sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                 }
                 if (sequencer.TimeElapsed < lerpDuration)
                 {
                     actorGO.GetComponent<SceneActor>().IsWalking = true;
-                    lerpedPos = Vector3.Lerp(sequencer.GetPosition("actorStart"), locationPos, sequencer.TimeElapsed / lerpDuration);
+                    lerpedPos = Vector3.Lerp(sequencer.Vars.GetVector("actorStart"), locationPos, sequencer.TimeElapsed / lerpDuration);
                     sequencer.TimeElapsed += Time.deltaTime;
                 }
                 else
@@ -199,18 +199,18 @@ public class MissionMain : MonoBehaviour
                 GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                 GameObject targetGO = sceneObjects.GetActorGO(result.Target.Actor);
 
-                if (!sequencer.IsPositionSet("actorStart"))
+                if (!sequencer.Vars.IsVectorSet("actorStart"))
                 {
-                    sequencer.SetPosition("actorStart", actorGO.transform.position);
+                    sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                     sequencer.ShowResultAction();
-                    sequencer.SetPosition("targetPos", targetGO.transform.position);
+                    sequencer.Vars.SetVector("targetPos", targetGO.transform.position);
                 }
 
                 (Vector3 attackerPos, Vector3 victimPos, bool knockbackStarted, bool done) 
                 = sequencer.AnimAttackWithKnockback(
                     result.IsSuccess, sequencer.TimeElapsed, 
                     animDuration, .5f, 1f, 
-                    sequencer.GetPosition("actorStart"), sequencer.GetPosition("targetPos") 
+                    sequencer.Vars.GetVector("actorStart"), sequencer.Vars.GetVector("targetPos") 
                     );
 
                 actorGO.transform.position = attackerPos;
@@ -266,23 +266,23 @@ public class MissionMain : MonoBehaviour
                 Vector3 lerpedPos;
                 /*Quaternion*/ float lerpedRotation = 0;
                 float lerpedHeight = 0;
-                if (!sequencer.IsPositionSet("actorStart"))
+                if (!sequencer.Vars.IsVectorSet("actorStart"))
                 {
-                    sequencer.SetPosition("actorStart", actorGO.transform.position);
+                    sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                 }
                 if (sequencer.TimeElapsed < lerpDuration)
                 {
                     //actorGO.GetComponent<SceneActor>().IsWalking = true;
                     if (result.IsSuccess)
                     {
-                        lerpedPos = Vector3.Lerp(sequencer.GetPosition("actorStart"), locationPos, sequencer.TimeElapsed / lerpDuration);
+                        lerpedPos = Vector3.Lerp(sequencer.Vars.GetVector("actorStart"), locationPos, sequencer.TimeElapsed / lerpDuration);
                         lerpedRotation = Mathf.Lerp(0, 360, sequencer.TimeElapsed / lerpDuration);
                         //startPos.y + Mathf.Sin( Mathf.PI * 2 * counter / 360)
                         lerpedHeight = Mathf.PingPong(sequencer.TimeElapsed / lerpDuration, 10f);  //Mathf.Sin((sequencer.TimeElapsed / lerpDuration) * 100/*Mathf.PI * 2 * (sequencer.TimeElapsed / lerpDuration) * 3600*/);
                     }
                     else
                     {
-                        lerpedPos = Vector3.Lerp(sequencer.GetPosition("actorStart"), locationPos,
+                        lerpedPos = Vector3.Lerp(sequencer.Vars.GetVector("actorStart"), locationPos,
                         Mathf.PingPong(sequencer.TimeElapsed, 100f));
                     }
                     //Salto rotation
@@ -308,7 +308,7 @@ public class MissionMain : MonoBehaviour
                         sceneObjects.ActorGOArriveToLocation(actorGO, result.Target.Location);
                     } else
                     {
-                        lerpedPos = sequencer.GetPosition("actorStart");
+                        lerpedPos = sequencer.Vars.GetVector("actorStart");
                     }
 
                     sequencer.FinishedResult = result;
@@ -345,9 +345,9 @@ public class MissionMain : MonoBehaviour
                     GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                     GameObject targetGO = sceneObjects.GetActorGO(result.Target.Actor);
 
-                    if (!sequencer.IsStringSet("_smoke"))
+                    if (!sequencer.Vars.IsStringSet("_smoke"))
                     {
-                        sequencer.SetString("_smoke", "");
+                        sequencer.Vars.SetString("_smoke", "");
                         Vector3 smokeDir = (targetGO.transform.position - actorGO.transform.position).normalized;
                         Vector3 smokePos = actorGO.transform.position + (smokeDir * 4f) + (Vector3.up * 4);
                         GameObject smoke = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ParticleSprite"), smokePos, Quaternion.identity);
@@ -362,18 +362,18 @@ public class MissionMain : MonoBehaviour
                         ptrSpr.moveStartPos = smokePos;
                     }
 
-                    if (!sequencer.IsPositionSet("actorStart"))
+                    if (!sequencer.Vars.IsVectorSet("actorStart"))
                     {
-                        sequencer.SetPosition("actorStart", actorGO.transform.position);
+                        sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                         sequencer.ShowResultAction();
-                        sequencer.SetPosition("targetPos", targetGO.transform.position);
+                        sequencer.Vars.SetVector("targetPos", targetGO.transform.position);
                     }
 
                     (Vector3 victimPos, bool knockbackStarted, bool done)
                     = sequencer.AnimKnockback(
                         result.IsSuccess, sequencer.TimeElapsed,
                         animDuration, .5f, 1f,
-                        sequencer.GetPosition("actorStart"), sequencer.GetPosition("targetPos")
+                        sequencer.Vars.GetVector("actorStart"), sequencer.Vars.GetVector("targetPos")
                         );
 
                     targetGO.transform.position = victimPos;
@@ -438,18 +438,18 @@ public class MissionMain : MonoBehaviour
                     GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                     GameObject targetGO = sceneObjects.GetActorGO(result.Target.Actor);
 
-                    if (!sequencer.IsPositionSet("actorStart"))
+                    if (!sequencer.Vars.IsVectorSet("actorStart"))
                     {
-                        sequencer.SetPosition("actorStart", actorGO.transform.position);
+                        sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                         sequencer.ShowResultAction();
-                        sequencer.SetPosition("targetPos", targetGO.transform.position);
+                        sequencer.Vars.SetVector("targetPos", targetGO.transform.position);
                     }
 
                     (Vector3 attackerPos, Vector3 victimPos, bool knockbackStarted, bool done)
                     = sequencer.AnimAttackWithKnockback(
                         result.IsSuccess, sequencer.TimeElapsed,
                         animDuration, .5f, 1f,
-                        sequencer.GetPosition("actorStart"), sequencer.GetPosition("targetPos")
+                        sequencer.Vars.GetVector("actorStart"), sequencer.Vars.GetVector("targetPos")
                         );
 
                     actorGO.transform.position = attackerPos;
@@ -524,18 +524,18 @@ public class MissionMain : MonoBehaviour
                 GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                 GameObject targetGO = sceneObjects.GetActorGO(result.Target.Actor);
 
-                if (!sequencer.IsPositionSet("actorStart"))
+                if (!sequencer.Vars.IsVectorSet("actorStart"))
                 {
-                    sequencer.SetPosition("actorStart", actorGO.transform.position);
+                    sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                     sequencer.ShowResultAction();
-                    sequencer.SetPosition("targetPos", targetGO.transform.position);
+                    sequencer.Vars.SetVector("targetPos", targetGO.transform.position);
                 }
 
                 (Vector3 attackerPos, Vector3 victimPos, bool knockbackStarted, bool done)
                 = sequencer.AnimAttackWithKnockback(
                     result.IsSuccess, sequencer.TimeElapsed,
                     animDuration, .5f, 1f,
-                    sequencer.GetPosition("actorStart"), sequencer.GetPosition("targetPos")
+                    sequencer.Vars.GetVector("actorStart"), sequencer.Vars.GetVector("targetPos")
                     );
 
                 actorGO.transform.position = attackerPos;
@@ -576,23 +576,23 @@ public class MissionMain : MonoBehaviour
                 Vector3 attackerPos;
                 Vector3 victimPos;
 
-                if (!sequencer.IsPositionSet("actorStart"))
+                if (!sequencer.Vars.IsVectorSet("actorStart"))
                 {
-                    sequencer.SetPosition("actorStart", actorGO.transform.position);
+                    sequencer.Vars.SetVector("actorStart", actorGO.transform.position);
                     sequencer.ShowResultAction();
-                    sequencer.SetPosition("targetPos", targetGO.transform.position);
-                    sequencer.SetPosition("cringePos", targetGO.transform.position + Vector3.up);
+                    sequencer.Vars.SetVector("targetPos", targetGO.transform.position);
+                    sequencer.Vars.SetVector("cringePos", targetGO.transform.position + Vector3.up);
                 }
 
-                victimPos = sequencer.GetPosition("targetPos");
+                victimPos = sequencer.Vars.GetVector("targetPos");
                 if (sequencer.TimeElapsed < animDuration)
                 {
-                    attackerPos = Vector3.Lerp(sequencer.GetPosition("actorStart"), sequencer.GetPosition("targetPos"), 
+                    attackerPos = Vector3.Lerp(sequencer.Vars.GetVector("actorStart"), sequencer.Vars.GetVector("targetPos"), 
                         Mathf.PingPong((sequencer.TimeElapsed / animDuration) * 2f, 1.0f));
                     if (sequencer.TimeElapsed >= .8f && result.IsSuccess)
                     {
                         sequencer.ActionPerformerPlayDefaultSound();
-                        victimPos = Vector3.Lerp(sequencer.GetPosition("targetPos"), sequencer.GetPosition("cringePos"), 
+                        victimPos = Vector3.Lerp(sequencer.Vars.GetVector("targetPos"), sequencer.Vars.GetVector("cringePos"), 
                             Mathf.PingPong((sequencer.TimeElapsed / animDuration) * 16f, 1.0f + deltaTime*2f));
                         targetGO.GetComponentInChildren<SpriteRenderer>().color = new Color(0, 
                             100 + Mathf.PingPong((sequencer.TimeElapsed / animDuration * 2), 150f), 
@@ -604,8 +604,8 @@ public class MissionMain : MonoBehaviour
                     sequencer.TimeElapsed += deltaTime;
                 } else
                 {
-                    attackerPos = sequencer.GetPosition("actorStart");
-                    victimPos = sequencer.GetPosition("targetPos");
+                    attackerPos = sequencer.Vars.GetVector("actorStart");
+                    victimPos = sequencer.Vars.GetVector("targetPos");
                     targetGO.GetComponentInChildren<SpriteRenderer>().color = Color.white;
                     sequencer.FinishedResult = result;
                 }

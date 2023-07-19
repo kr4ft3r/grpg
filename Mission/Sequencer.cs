@@ -13,6 +13,15 @@ public class Sequencer : MonoBehaviour
     public SceneObjects SceneObjects;
     public MissionUI MissionUI;
 
+    /// <summary>
+    /// Sequence variables that persist only during single sequence
+    /// </summary>
+    public Vars Vars { get; private set; }
+    /// <summary>
+    /// Seqence variables that persist throughout mission
+    /// </summary>
+    public Vars MissionVars { get; private set; }
+
     private List<ActionResult> _results;
     private Dictionary<string, Vector3> _positionVars;
     private Dictionary<string, string> _stringVars;
@@ -29,6 +38,8 @@ public class Sequencer : MonoBehaviour
         _results = new List<ActionResult>();
         _positionVars = new Dictionary<string, Vector3>();
         _stringVars = new Dictionary<string, string>();
+        Vars = new Vars();
+        MissionVars = new Vars();
     }
 
     // Start is called before the first frame update
@@ -67,8 +78,7 @@ public class Sequencer : MonoBehaviour
                 RunningResult = _results[0];
                 if (RunningResult.Actor.Team == Team.AI) MissionUI.SetActiveActor(RunningResult.Actor); // run active actor info & cosmetics for AI
                 TimeElapsed = 0;
-                _positionVars = new Dictionary<string, Vector3>();
-                _stringVars = new Dictionary<string, string>();
+                Vars = new Vars();
             }
 
             HandleResultFrame(_results[0]);
@@ -136,8 +146,7 @@ public class Sequencer : MonoBehaviour
     public void RunSceneSequence(System.Action<MissionUI, Sequencer, SceneObjects, float> sequence)
     {
         TimeElapsed = 0;
-        _positionVars = new Dictionary<string, Vector3>();
-        _stringVars = new Dictionary<string, string>();
+        Vars = new Vars();
         RunningSceneSequence = sequence;
         SceneSequenceFinished = false;
     }
@@ -150,7 +159,7 @@ public class Sequencer : MonoBehaviour
         if (dialogue.Count == 0 || _dialogueIndex >= dialogue.Count)
         {
             _dialogueIndex = 0;
-            SetString("_dialogue_" + "end", "");
+            Vars.SetString("_dialogue_" + "end", "");
             MissionUI.HideDialoguePanel();
             if (nextSceneSequence == null) // No next sequence, but end this one
             {
@@ -168,9 +177,9 @@ public class Sequencer : MonoBehaviour
             }
         }
 
-        if (!IsStringSet("_dialogue_" + _dialogueIndex))
+        if (!Vars.IsStringSet("_dialogue_" + _dialogueIndex))
         {
-            SetString("_dialogue_" + _dialogueIndex, "");
+            Vars.SetString("_dialogue_" + _dialogueIndex, "");
             MissionUI.ShowDialogueWindow(
                 SceneObjects.CharacterPresentations[dialogue.ElementAt(_dialogueIndex).Item1],
                 dialogue.ElementAt(_dialogueIndex).Item2);
@@ -199,57 +208,25 @@ public class Sequencer : MonoBehaviour
         _results.Add(result);
     }
 
-    // Variables
-
-    public void SetPosition(string index, Vector3 pos)
-    {
-        _positionVars[index] = pos;
-    }
-
-    public Vector3 GetPosition(string index)
-    {
-        return _positionVars[index];
-    }
-
-    public bool IsPositionSet(string index)
-    {
-        return _positionVars.ContainsKey(index);
-    }
-
-    public void SetString(string index, string value)
-    {
-        _stringVars[index] = value;
-    }
-
-    public string GetString(string index)
-    {
-        return _stringVars[index];
-    }
-
-    public bool IsStringSet(string index)
-    {
-        return _stringVars.ContainsKey(index);
-    }
-
     // INFO
 
     public void ShowResultAction()
     {
-        if (IsStringSet("_show_action")) return;
+        if (Vars.IsStringSet("_show_action")) return;
         if (RunningResult == null) return;
         SceneObjects.GetActorGO(RunningResult.Actor).GetComponent<SceneActor>().AddInfoText(
             RunningResult.Action.Name
             );
-        SetString("_show_action", "");
+        Vars.SetString("_show_action", "");
     }
 
     // SFX: sounds
 
     public void ActorPlaySoundOnce(Actor actor, string sound, float volumeScale = 1.0f)
     {//TODO better do init callback
-        if (IsStringSet("_play_sound_" + sound)) return;
+        if (Vars.IsStringSet("_play_sound_" + sound)) return;
 
-        SetString("_play_sound_" + sound, sound);
+        Vars.SetString("_play_sound_" + sound, sound);
         ActorPlaySound(actor, sound, volumeScale);
     }
 

@@ -125,7 +125,7 @@ public class GameMissions
         return new SceneSequenceData(
             new Dictionary<string, System.Action<MissionUI, Sequencer, SceneObjects, float>>() {
                 {"intro", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
-                    if (!sequencer.IsStringSet("_dialogue_" + 0)) //TODO better to have isfirstframe func
+                    if (!sequencer.Vars.IsStringSet("_dialogue_" + 0)) //TODO better to have isfirstframe func
                     { // Move all monster up so they can jump ye
                         foreach(KeyValuePair<Actor,GameObject> kv in sceneObjects.ActorObjects)
                             if (kv.Value.GetComponent<SceneActor>().Presentation.Name == "Devourer")
@@ -145,9 +145,9 @@ public class GameMissions
                 {"monsters_appear", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
                     //TODO implement bool values
                     float fallDuration = 0.4f;
-                    bool monster1Appeared = sequencer.IsStringSet("monster1_appeared");
-                    bool monster2Appeared = sequencer.IsStringSet("monster2_appeared");
-                    bool monster3Appeared = sequencer.IsStringSet("monster3_appeared");
+                    bool monster1Appeared = sequencer.Vars.IsStringSet("monster1_appeared");
+                    bool monster2Appeared = sequencer.Vars.IsStringSet("monster2_appeared");
+                    bool monster3Appeared = sequencer.Vars.IsStringSet("monster3_appeared");
                     GameObject devourer1GO = sceneObjects.GetActorGOByUniqueName("Devourer 1");
                     GameObject devourer2GO = sceneObjects.GetActorGOByUniqueName("Devourer 2");
                     GameObject devourer3GO = sceneObjects.GetActorGOByUniqueName("Devourer 3");
@@ -155,26 +155,26 @@ public class GameMissions
                     // TODO int vals
                     if (sequencer.TimeElapsed >= 0.2f && !monster1Appeared)
                     {
-                        sequencer.SetString("monster1_appeared", (sequencer.TimeElapsed).ToString());
-                        sequencer.SetPosition("monster1_goal", devourer1GO.transform.position);
+                        sequencer.Vars.SetString("monster1_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster1_goal", devourer1GO.transform.position);
                         devourer1GO.transform.Translate(Vector3.up * 10);
-                        sequencer.SetPosition("monster1_position", devourer1GO.transform.position);
+                        sequencer.Vars.SetVector("monster1_position", devourer1GO.transform.position);
                         devourer1GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
                     }
                     if (sequencer.TimeElapsed >= 0.4f && !monster2Appeared)
                     {
-                        sequencer.SetString("monster2_appeared", (sequencer.TimeElapsed).ToString());
-                        sequencer.SetPosition("monster2_goal", devourer2GO.transform.position);
+                        sequencer.Vars.SetString("monster2_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster2_goal", devourer2GO.transform.position);
                         sceneObjects.GetActorGOByUniqueName("Devourer 2").transform.Translate(Vector3.up * 10);
-                        sequencer.SetPosition("monster2_position", devourer2GO.transform.position);
+                        sequencer.Vars.SetVector("monster2_position", devourer2GO.transform.position);
                         devourer2GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
                     }
                     if (sequencer.TimeElapsed >= 0.6f && !monster3Appeared)
                     {
-                        sequencer.SetString("monster3_appeared", (sequencer.TimeElapsed).ToString());
-                        sequencer.SetPosition("monster3_goal", devourer3GO.transform.position);
+                        sequencer.Vars.SetString("monster3_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster3_goal", devourer3GO.transform.position);
                         sceneObjects.GetActorGOByUniqueName("Devourer 3").transform.Translate(Vector3.up * 10);
-                        sequencer.SetPosition("monster3_position", devourer3GO.transform.position);
+                        sequencer.Vars.SetVector("monster3_position", devourer3GO.transform.position);
                         devourer3GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
                     }
 
@@ -182,49 +182,49 @@ public class GameMissions
 
                     if (monster1Appeared)
                     {
-                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.GetString("monster1_appeared"));
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster1_appeared"));
                         if (timePassed < fallDuration)
                         {
-                            devourer1GO.transform.position = Vector3.Lerp(sequencer.GetPosition("monster1_position"), sequencer.GetPosition("monster1_goal"), timePassed / fallDuration);
+                            devourer1GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster1_position"), sequencer.Vars.GetVector("monster1_goal"), timePassed / fallDuration);
                         } else
                         {
-                            devourer1GO.transform.position = sequencer.GetPosition("monster1_goal");
-                            if(!sequencer.IsStringSet("monster1_playedsound"))
+                            devourer1GO.transform.position = sequencer.Vars.GetVector("monster1_goal");
+                            if(!sequencer.Vars.IsStringSet("monster1_playedsound"))
                             {
                                 devourer1GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
-                                sequencer.SetString("monster1_playedsound", "");
+                                sequencer.Vars.SetString("monster1_playedsound", "");
                             }
                         }
                     }
                     if (monster2Appeared)
                     {
-                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.GetString("monster2_appeared"));
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster2_appeared"));
                         if (timePassed < fallDuration)
                         {
-                            devourer2GO.transform.position = Vector3.Lerp(sequencer.GetPosition("monster2_position"), sequencer.GetPosition("monster2_goal"), timePassed / fallDuration);
+                            devourer2GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster2_position"), sequencer.Vars.GetVector("monster2_goal"), timePassed / fallDuration);
                         } else
                         {
-                            devourer2GO.transform.position = sequencer.GetPosition("monster2_goal");
-                            if(!sequencer.IsStringSet("monster2_playedsound"))
+                            devourer2GO.transform.position = sequencer.Vars.GetVector("monster2_goal");
+                            if(!sequencer.Vars.IsStringSet("monster2_playedsound"))
                             {
                                 devourer2GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
-                                sequencer.SetString("monster2_playedsound", "");
+                                sequencer.Vars.SetString("monster2_playedsound", "");
                             }
                         }
                     }
                     if (monster3Appeared)
                     {
-                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.GetString("monster3_appeared"));
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster3_appeared"));
                         if (timePassed < fallDuration)
                         {
-                            devourer3GO.transform.position = Vector3.Lerp(sequencer.GetPosition("monster3_position"), sequencer.GetPosition("monster3_goal"), timePassed / fallDuration);
+                            devourer3GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster3_position"), sequencer.Vars.GetVector("monster3_goal"), timePassed / fallDuration);
                         } else
                         {
-                            devourer3GO.transform.position = sequencer.GetPosition("monster3_goal");
-                            if(!sequencer.IsStringSet("monster3_playedsound"))
+                            devourer3GO.transform.position = sequencer.Vars.GetVector("monster3_goal");
+                            if(!sequencer.Vars.IsStringSet("monster3_playedsound"))
                             {
                                 devourer3GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
-                                sequencer.SetString("monster3_playedsound", "");
+                                sequencer.Vars.SetString("monster3_playedsound", "");
                             }
 
                             sequencer.SceneSequenceFinished = true;
@@ -240,11 +240,11 @@ public class GameMissions
                         ("Simone", "Poor soul… Wait, what’s this? A saber! Andy, CATCH!"),
                         ("Andrea", "Good job sis, now we’re talking! I will carve into these creeps an even bigger mouth.")
                     });
-                    if (sequencer.IsStringSet("_dialogue_1") && !sequencer.IsStringSet("_equpped"))
+                    if (sequencer.Vars.IsStringSet("_dialogue_1") && !sequencer.Vars.IsStringSet("_equpped"))
                     {
                         missionUI.Log("EQUIPPING");
                         ActorManager.Instance.ActorEquipAction("Andrea", RoaringStarActions.GetSabreSwingAction(1));
-                        sequencer.SetString("_equipped", "");
+                        sequencer.Vars.SetString("_equipped", "");
                         sequencer.ActorPlaySoundOnce(ActorManager.Instance.GetActorByName("Andrea"), "female_warrior_cheer");
                     }
                 }},
@@ -254,10 +254,10 @@ public class GameMissions
                         ("Red", "What a wretch… You, my dead fellow, are the bare bones of a cautionary tale."),
                         ("Red", "Hold on, what do we have here? Flintlock pistol, as good as new. And ammo as well! And I am famous for my aim is what I am.")
                     });
-                    if (sequencer.IsStringSet("_dialogue_1") && !sequencer.IsStringSet("_equpped"))
+                    if (sequencer.Vars.IsStringSet("_dialogue_1") && !sequencer.Vars.IsStringSet("_equpped"))
                     {
                         ActorManager.Instance.ActorEquipAction("Red", RoaringStarActions.GetSnipeAction(1));
-                        sequencer.SetString("_equipped", "");
+                        sequencer.Vars.SetString("_equipped", "");
                         sequencer.ActorPlaySoundOnce(ActorManager.Instance.GetActorByName("Red"), "female_high_yes");
                     }
                 }}
