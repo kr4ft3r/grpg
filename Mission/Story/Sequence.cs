@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// Unused
+/// </summary>
 public class Sequence
 {
     public static Sequence? Current { get; set; }
