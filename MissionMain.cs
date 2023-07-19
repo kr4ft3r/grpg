@@ -348,15 +348,18 @@ public class MissionMain : MonoBehaviour
                     if (!sequencer.IsStringSet("_smoke"))
                     {
                         sequencer.SetString("_smoke", "");
-                        Vector3 smokePos = (targetGO.transform.position - actorGO.transform.position).normalized * 2f;
-                        smokePos = actorGO.transform.position + smokePos + (Vector3.up * 4);
+                        Vector3 smokeDir = (targetGO.transform.position - actorGO.transform.position).normalized;
+                        Vector3 smokePos = actorGO.transform.position + (smokeDir * 4f) + (Vector3.up * 4);
                         GameObject smoke = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/ParticleSprite"), smokePos, Quaternion.identity);
-                        smoke.transform.localScale *= 50f;
+                        smoke.transform.localScale += new Vector3(50f, 50f, 1);
                         ParticleSpriteScript ptrSpr = smoke.GetComponent<ParticleSpriteScript>();
                         ptrSpr.Sprites = Resources.LoadAll<Sprite>("Sprites/Effects/SmokeAndFire");
                         ptrSpr.AnimFrom = 0;
                         ptrSpr.AnimTo = 7;
                         ptrSpr.lifeTime = .7f;
+                        ptrSpr.moveDirection = smokeDir * 2f;
+                        ptrSpr.moveDirectionLength = .5f;
+                        ptrSpr.moveStartPos = smokePos;
                     }
 
                     if (!sequencer.IsPositionSet("actorStart"))

@@ -12,6 +12,10 @@ public class ParticleSpriteScript : MonoBehaviour
     public float lifeTime;
     public int FPS = 10;
 
+    public Vector3 moveStartPos;
+    public Vector3 moveDirection;
+    public float moveDirectionLength;
+
     private float _time;
     private float _animTime;
     private int _animIndex = 0;
@@ -58,6 +62,11 @@ public class ParticleSpriteScript : MonoBehaviour
             {
                 _animTime += Time.deltaTime;
             }
+        }
+
+        if (moveDirectionLength > 0.00f && moveDirection != null && moveStartPos != null)
+        {
+            transform.position = Vector3.Lerp(moveStartPos, moveStartPos + moveDirection, _time / moveDirectionLength);
         }
 
 
