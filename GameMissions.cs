@@ -44,7 +44,7 @@ public class GameMissions
 
         // Simona
         CharacterStats simonaStats = new CharacterStats();
-        simonaStats.Actions = new List<Action>() { Action.Move, RoaringStarActions.GetSnipeAction(1) };
+        simonaStats.Actions = new List<Action>() { Action.Move };
         simonaStats.PerBattleResources = new CounterDict<Resource>() { };
         simonaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Simone", new MissionActorBlueprint(
