@@ -66,6 +66,7 @@ namespace GRPG.GameLogic
 
         public virtual ActionValidity GetActionValidity(Actor actor)
         {
+            if (Constraint.HasFlag(TargetConstraint.Passive)) return ActionValidity.Valid;
             var mission = actor.Mission;
             if (mission.CurrentTeam != actor.Team) return ActionValidity.NotMyTurn;
             if (!actor.Resources.Contains(this.Cost)) return ActionValidity.NotEnoughResources;
@@ -110,7 +111,8 @@ namespace GRPG.GameLogic
 
         public ActionResult Perform(Actor actor, ActionTarget target)
         {
-            if (GetActionValidity(actor, target) != ActionValidity.Valid) throw new System.Exception("Invalid target.");
+            ActionValidity validity = GetActionValidity(actor, target);
+            if (validity != ActionValidity.Valid) throw new System.Exception("Invalid perform: " + validity.ToString());
             var result = DoPerform(actor, target);
             actor.Resources.Substract(this.Cost);
             actor.Mission.AfterActionPerformed(result);

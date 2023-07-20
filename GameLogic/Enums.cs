@@ -41,6 +41,7 @@ namespace GRPG.GameLogic
         Ally = 16,              // Ally (non-self) targeting allowed
         NeighbourOnly = 32,     // Location must be neighbouring own location (CanMove)
         OwnLocationOnly = 64,   // actor.Location has to be target.Location or target.Actor.Location
+        Passive = 128,          // Will not check for turn and resources, action triggered from script
     }
 
     public enum ActionValidity
