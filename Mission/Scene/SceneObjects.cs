@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using GRPG.GameLogic;
 
@@ -165,7 +166,30 @@ public class SceneObjects
 
     public void OnActorWasKilled(Actor actor)
     {
-        GetActorGO(actor).transform.RotateAround(GetActorGO(actor).transform.position, Vector3.forward, 90);//TODO
+        //GetActorGO(actor).transform.RotateAround(GetActorGO(actor).transform.position, Vector3.forward, 90);//TODO
+        /*if (actor.Team == Team.Human)
+        {
+            sequencer.MissionVars.SetString("_dead_character", actor.Name);
+            sequencer.MissionUI.SetSceneSequenceUIState("player_character_died");
+        }*/
+    }
+
+    public bool CheckForLoseCondition()
+    {
+        List<Actor> playerActors = ActorObjects.Where(a => a.Key.Team == Team.Human).Select(a => a.Key).ToList();
+        foreach (Actor actor in playerActors)
+            if (GetActorGO(actor).GetComponent<SceneActor>().IsDying) //TODO HasDied
+            {
+                sequencer.MissionVars.SetString("_dead_character", actor.Name);
+                sequencer.MissionUI.SetSceneSequenceUIState("player_character_died");
+                return true;
+            }
+        return false;
+    }
+
+    public void RestartMission()//TODO move, temporary solution
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     //

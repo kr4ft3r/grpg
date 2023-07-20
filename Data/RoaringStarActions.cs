@@ -233,6 +233,7 @@ public class NaturalBlink : Action
         if (actor.Team == Team.AI) enemyTeam = Team.Human;
         List<int> validLocations = Enumerable.Range(0, actor.Mission.NumLocations).ToList();
         List<int> invalidLocations = actor.Mission.GetTeamMembers(enemyTeam).Select(e => e.Location).ToList();
+        invalidLocations.Add(actor.Location);// not my location either
         validLocations = validLocations.Except(invalidLocations).ToList(); // diff
         int location = Random.Range(0, validLocations.Count);
         target.Location = location;

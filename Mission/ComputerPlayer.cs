@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using GRPG.GameLogic;
@@ -40,6 +41,12 @@ public class ComputerPlayer //TODO inheritance if there is need
 
     public void RunMoves()
     {
+        if(_mission.GetTeamMembers(_team).Count() == 0) //TODO move to a better place
+        {
+            _missionUI.SetSceneSequenceUIState("outro");
+            return;
+        }
+
         _missionUI.SetActiveTeam(_team);
         _missionUI.SetAITurnUIState();
 
@@ -92,7 +99,8 @@ public class ComputerPlayer //TODO inheritance if there is need
 
     public void SequencesDone()
     {
-        HumanPlayer.Instance.InitMove();
+        if(!_sceneObjects.CheckForLoseCondition())
+            HumanPlayer.Instance.InitMove();
     }
 
     /*public void SceneSequenceDone()

@@ -485,19 +485,59 @@ public class MissionMain : MonoBehaviour
             RoaringStarActions.GetNaturalBlink().Name,
             new ActionPresentationData(
             null,
-            ActionPresentationData.IconSlotSecondary,
+            null,
             (Sequencer sequencer, ActionResult result, SceneObjects sceneObjects, float deltaTime) => {
                 sequencer.ActionPerformerPlayDefaultSound();
-                if (result.IsSuccess)
+                /*if (result.IsSuccess)
                 {
                     GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                     actorGO.transform.position = sceneObjects.GetLocationSlotPositionByIndex(result.Target.Location);
                     sceneObjects.ActorGOArriveToLocation(actorGO, result.Target.Location);
                 }
-                sequencer.FinishedResult = result;
-                
+                sequencer.FinishedResult = result;*/
+                if (!sequencer.Vars.IsBoolSet("_setup_done"))
+                {
+                    sequencer.Vars.SetInt("_blink_stage", 0);
+                    sequencer.Vars.SetBool("_setup_done", true);
+                }
+                int blinkStage = sequencer.Vars.GetInt("_blink_stage");
+                GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
+
+                if (blinkStage == 0 && sequencer.TimeElapsed >= 0.1f)
+                {
+                    actorGO.GetComponent<SceneActor>().SetSpriteColor(Color.black);
+                    sequencer.Vars.SetInt("_blink_stage", 1);
+                }
+                if (blinkStage == 1 && sequencer.TimeElapsed >= 0.3f)
+                {
+                    actorGO.GetComponent<SceneActor>().SetSpriteColorWhite();
+                    sequencer.Vars.SetInt("_blink_stage", 2);
+                }
+                if (blinkStage == 2 && sequencer.TimeElapsed >= 0.5f)
+                {
+                    actorGO.transform.position = sceneObjects.GetLocationSlotPositionByIndex(result.Target.Location);
+                    sceneObjects.ActorGOArriveToLocation(actorGO, result.Target.Location);
+                    sequencer.Vars.SetInt("_blink_stage", 3);
+                }
+                if (blinkStage == 3 && sequencer.TimeElapsed >= 0.8f) {
+                    actorGO.GetComponent<SceneActor>().SetSpriteColor(Color.white);
+                    sequencer.Vars.SetInt("_blink_stage", 4);
+                }
+                if (blinkStage == 4)
+                {
+                    sequencer.ShowResultAction();
+                    sequencer.FinishedResult = result;
+                    if (!sequencer.MissionVars.IsBoolSet("_simone_blinked"))
+                    {
+                        sequencer.SetSceneSequenceAfterAction("simone_blinked_first_time");
+                        sequencer.MissionVars.SetBool("_simone_blinked", true);
+                    }
+                }
+
+                sequencer.TimeElapsed += deltaTime;
+
             },
-            "woosh",
+            "shvicc",
             "woosh",
             "woosh"
             ));

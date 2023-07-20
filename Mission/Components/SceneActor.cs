@@ -15,6 +15,7 @@ public class SceneActor : MonoBehaviour
     /// </summary>
     public bool IsWalking = false;
     public bool IsDying = false;
+    public bool HasDied = false;
 
     public Font LabelFont;
 
@@ -77,6 +78,7 @@ public class SceneActor : MonoBehaviour
                 _animIndex++;
                 if (_animIndex >= Presentation.DeadSprites.Count) { 
                     IsDying = false; // it's ok you can stop dying now
+                    HasDied = true; // and start being dead
                 } else
                 {
                     _sprite.GetComponent<SpriteRenderer>().sprite = Presentation.DeadSprites[_animIndex];
@@ -132,7 +134,7 @@ public class SceneActor : MonoBehaviour
     public void Die()
     {
         IsDying = true;
-        AddInfoText("Dead");
+        //AddInfoText("Dead");
     }
 
     public void SetPresentation(CharacterPresentation presentation)

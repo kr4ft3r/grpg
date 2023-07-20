@@ -124,6 +124,16 @@ public class GameMissions
     {
         return new SceneSequenceData(
             new Dictionary<string, System.Action<MissionUI, Sequencer, SceneObjects, float>>() {
+                {"player_character_died", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    string deadCharacter = sequencer.MissionVars.GetString("_dead_character");
+                    sequencer.HandleDialogue(new List<(string,string)>() {
+                        ("Simone", "No, "+deadCharacter+"! This can't be happpening... This did NOT happen!!!"),
+                        ("Simone", "* TODO: insert some short but epic screen-wide blast, as Simone alters reality *")
+                    }, "mission_failed");
+                }},
+                {"mission_failed", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
+                    sceneObjects.RestartMission();
+                } },
                 {"intro", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
                     if (!sequencer.Vars.IsStringSet("_dialogue_" + 0)) //TODO better to have isfirstframe func
                     { // Move all monster up so they can jump ye
@@ -234,6 +244,16 @@ public class GameMissions
                     sequencer.TimeElapsed += deltaTime;
                     //
                 }},
+                {"outro", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    sequencer.HandleDialogue(new List<(string,string)>() {
+                        ("Andrea", "Aaand that would be the last one. Hoorah! No pirate has ever defeated the Cave of Devourers!"),
+                        ("Simone", "I’m so happy, sis! The spirit of our dear mother must have been watching over us."),
+                        ("Andrea", "And you got some tricks on you as well. What was that, with you teleporting about?"),
+                        ("Simone", "I honestly don’t know, Andy. I just got so scared of monsters, I wished to be somewhere else and all of a sudden I really was somewhere else!"),
+                        ("Red", "If you’re done celebrating the little brat’s demonic powers, I would like to announce that I have found a treasure map on this unlucky individual."),
+                        ("Andrea", "A treasure map you say? Now that brings an old itch.")
+                    });
+                }},
                 {"simone_search_skeleton", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
                     //if (!sequencer.IsStringSet("_dialogue_" + 0))
                     sequencer.HandleDialogue(new List<(string,string)>(){
@@ -261,8 +281,13 @@ public class GameMissions
                         sequencer.ActorPlaySoundOnce(ActorManager.Instance.GetActorByName("Red"), "female_high_yes");
                     }
                 }},
-                {"actor_is_damaged", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
-                    sequencer.SceneSequenceFinished = true;
+                {"simone_blinked_first_time", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    sequencer.HandleDialogue(new List<(string,string)>() {
+                        ("Simone", "What... Why am I here?"),
+                        ("Andrea", "Simone! Did you just freaking teleported?"),
+                        ("Red", "By the Roaring Star… That little brat is a witch! I always knew it!"),
+                        ("Simone", "I didn’t do anything, I swear!")
+                    });
                 }}
             }
             );
