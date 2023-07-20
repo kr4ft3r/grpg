@@ -36,6 +36,11 @@ public class RoaringStarActions
         return Action.Null;
     }
 
+    public static Action GetNaturalBlink()
+    {
+        return new NaturalBlink();
+    }
+
     //
 
     public static Action GetSearchSkeletonSceneAction()
@@ -209,6 +214,33 @@ public class SnipeLevel1Action : Action
  * Magician
  */
 
+// Mission 1 scripted spell, teleport to location without enemies
+public class NaturalBlink : Action
+{
+    public NaturalBlink()
+    {
+        Name = "Natural Blink";
+        Constraint = TargetConstraint.Location | TargetConstraint.Passive;
+        Cost = new CounterDict<Resource>(Resource.PrimaryAction, 1);
+    }
+    protected override int CalcSuccessChance(Actor actor, ActionTarget target)
+    {
+        return 100;
+    }
+    protected override ActionResult DoPerform(Actor actor, ActionTarget target)
+    {
+        Team enemyTeam = Team.AI;
+        if (actor.Team == Team.AI) enemyTeam = Team.Human;
+        List<int> validLocations = Enumerable.Range(0, actor.Mission.NumLocations).ToList();
+        List<int> invalidLocations = actor.Mission.GetTeamMembers(enemyTeam).Select(e => e.Location).ToList();
+        validLocations = validLocations.Except(invalidLocations).ToList(); // diff
+        int location = Random.Range(0, validLocations.Count);
+        target.Location = location;
+        actor.Location = target.Location;
+
+        return new ActionResult(actor, this, target, true);
+    }
+}
 
 
 /*
@@ -255,6 +287,13 @@ public class ActionSmack : Action
 
     protected override ActionResult DoPerform(Actor actor, ActionTarget target)
     {
+        //Hacky
+        if (MissionData.Instance.MissionName == "Cave of Devourers" && target.Actor.Name == "Simone")
+        {
+            RoaringStarActions.GetNaturalBlink().Perform(target.Actor, new ActionTarget(0));
+            return new ActionResult(actor, this, target, -1, GetSuccessChance(actor, target), false);
+        }
+
         var chance = GetSuccessChance(actor, target);
         var roll = Dice.Roll(100);
         var succ = roll <= chance;
@@ -284,6 +323,13 @@ public class AcidLick : Action
 
     protected override ActionResult DoPerform(Actor actor, ActionTarget target)
     {
+        //Hacky
+        if (MissionData.Instance.MissionName == "Cave of Devourers" && target.Actor.Name == "Simone")
+        {
+            RoaringStarActions.GetNaturalBlink().Perform(target.Actor, new ActionTarget(0));
+            return new ActionResult(actor, this, target, -1, GetSuccessChance(actor, target), false);
+        }
+
         var chance = GetSuccessChance(actor, target);
         var roll = Dice.Roll(100);
         var succ = roll <= chance;

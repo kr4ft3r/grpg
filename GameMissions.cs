@@ -260,6 +260,9 @@ public class GameMissions
                         sequencer.Vars.SetString("_equipped", "");
                         sequencer.ActorPlaySoundOnce(ActorManager.Instance.GetActorByName("Red"), "female_high_yes");
                     }
+                }},
+                {"actor_is_damaged", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    sequencer.SceneSequenceFinished = true;
                 }}
             }
             );

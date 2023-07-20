@@ -478,6 +478,30 @@ public class MissionMain : MonoBehaviour
                 )
             );
 
+        /* Natural Blink presentation
+         */
+
+        sceneObjects.ActionPresentations.Add(
+            RoaringStarActions.GetNaturalBlink().Name,
+            new ActionPresentationData(
+            null,
+            ActionPresentationData.IconSlotSecondary,
+            (Sequencer sequencer, ActionResult result, SceneObjects sceneObjects, float deltaTime) => {
+                sequencer.ActionPerformerPlayDefaultSound();
+                if (result.IsSuccess)
+                {
+                    GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
+                    actorGO.transform.position = sceneObjects.GetLocationSlotPositionByIndex(result.Target.Location);
+                    sceneObjects.ActorGOArriveToLocation(actorGO, result.Target.Location);
+                }
+                sequencer.FinishedResult = result;
+                
+            },
+            "woosh",
+            "woosh",
+            "woosh"
+            ));
+
         /*
          * Mission Location Actions
          */
@@ -518,6 +542,10 @@ public class MissionMain : MonoBehaviour
                 else
                 {
                     sequencer.ActorPlaySoundOnce(result.Actor, "woosh");
+                }
+                if (result.DiceRoll == -1) // Must be Simone
+                {
+                    sequencer.FinishedResult = result;
                 }
 
                 float animDuration = 0.4f;
@@ -569,7 +597,12 @@ public class MissionMain : MonoBehaviour
             null,
             ActionPresentationData.IconSlotSecondary,
             (Sequencer sequencer, ActionResult result, SceneObjects sceneObjects, float deltaTime) => {
-                
+
+                if (result.DiceRoll == -1) // Must be Simone
+                {
+                    sequencer.FinishedResult = result;
+                }
+
                 float animDuration = 2.0f;
                 GameObject actorGO = sceneObjects.GetActorGO(result.Actor);
                 GameObject targetGO = sceneObjects.GetActorGO(result.Target.Actor);
