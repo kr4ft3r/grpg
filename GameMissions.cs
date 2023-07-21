@@ -48,7 +48,7 @@ public class GameMissions
         simonaStats.PerBattleResources = new CounterDict<Resource>() { };
         simonaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Simone", new MissionActorBlueprint(
-            "Simone", 12,
+            "Simone", 18,
             new CharacterPresentation(
                 "Simone",
                 "testsimone",
@@ -66,7 +66,7 @@ public class GameMissions
         andreaStats.PerBattleResources = new CounterDict<Resource>() { };
         andreaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Andrea", new MissionActorBlueprint(
-            "Andrea", 41,
+            "Andrea", 48,
             new CharacterPresentation(
                 "Andrea",
                 "testportrait",
@@ -84,7 +84,7 @@ public class GameMissions
         redStats.PerBattleResources = new CounterDict<Resource>() { };
         redStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Red", new MissionActorBlueprint(
-            "Red", 24,
+            "Red", 28,
             new CharacterPresentation(
                 "Red",
                 "testred",
@@ -114,7 +114,7 @@ public class GameMissions
                 deadSprites: new List<string>() { "Demon/ded1", "Demon/ded2", "Demon/ded3", "Demon/ded4", "Demon/ded5" }),
             devourerStats,
             Team.AI,
-            new int[3] { 3, 11, 5 }
+            new int[6] { 3, 11, 5, 7, 8, 10 }
         ));
 
         return actors;
@@ -158,9 +158,15 @@ public class GameMissions
                     bool monster1Appeared = sequencer.Vars.IsStringSet("monster1_appeared");
                     bool monster2Appeared = sequencer.Vars.IsStringSet("monster2_appeared");
                     bool monster3Appeared = sequencer.Vars.IsStringSet("monster3_appeared");
+                    bool monster4Appeared = sequencer.Vars.IsStringSet("monster4_appeared");
+                    bool monster5Appeared = sequencer.Vars.IsStringSet("monster5_appeared");
+                    bool monster6Appeared = sequencer.Vars.IsStringSet("monster6_appeared");
                     GameObject devourer1GO = sceneObjects.GetActorGOByUniqueName("Devourer 1");
                     GameObject devourer2GO = sceneObjects.GetActorGOByUniqueName("Devourer 2");
                     GameObject devourer3GO = sceneObjects.GetActorGOByUniqueName("Devourer 3");
+                    GameObject devourer4GO = sceneObjects.GetActorGOByUniqueName("Devourer 4");
+                    GameObject devourer5GO = sceneObjects.GetActorGOByUniqueName("Devourer 5");
+                    GameObject devourer6GO = sceneObjects.GetActorGOByUniqueName("Devourer 6");
                     //TODO GameObject[] monsters = new GameObject[3] {devourer1GO, devourer2GO, devourer3GO};
                     // TODO int vals
                     if (sequencer.TimeElapsed >= 0.2f && !monster1Appeared)
@@ -186,6 +192,30 @@ public class GameMissions
                         sceneObjects.GetActorGOByUniqueName("Devourer 3").transform.Translate(Vector3.up * 10);
                         sequencer.Vars.SetVector("monster3_position", devourer3GO.transform.position);
                         devourer3GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    }
+                    if (sequencer.TimeElapsed >= 0.7f && !monster4Appeared)
+                    {
+                        sequencer.Vars.SetString("monster4_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster4_goal", devourer4GO.transform.position);
+                        sceneObjects.GetActorGOByUniqueName("Devourer 4").transform.Translate(Vector3.up * 10);
+                        sequencer.Vars.SetVector("monster4_position", devourer4GO.transform.position);
+                        devourer4GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    }
+                    if (sequencer.TimeElapsed >= 0.8f && !monster5Appeared)
+                    {
+                        sequencer.Vars.SetString("monster5_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster5_goal", devourer5GO.transform.position);
+                        sceneObjects.GetActorGOByUniqueName("Devourer 5").transform.Translate(Vector3.up * 10);
+                        sequencer.Vars.SetVector("monster5_position", devourer5GO.transform.position);
+                        devourer5GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    }
+                    if (sequencer.TimeElapsed >= 0.9f && !monster6Appeared)
+                    {
+                        sequencer.Vars.SetString("monster6_appeared", (sequencer.TimeElapsed).ToString());
+                        sequencer.Vars.SetVector("monster6_goal", devourer6GO.transform.position);
+                        sceneObjects.GetActorGOByUniqueName("Devourer 6").transform.Translate(Vector3.up * 10);
+                        sequencer.Vars.SetVector("monster6_position", devourer6GO.transform.position);
+                        devourer6GO.GetComponentInChildren<SpriteRenderer>().enabled = true;
                     }
 
                     float timePassed;
@@ -235,6 +265,54 @@ public class GameMissions
                             {
                                 devourer3GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
                                 sequencer.Vars.SetString("monster3_playedsound", "");
+                            }
+                        }
+                    }
+                    if (monster4Appeared)
+                    {
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster4_appeared"));
+                        if (timePassed < fallDuration)
+                        {
+                            devourer4GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster4_position"), sequencer.Vars.GetVector("monster4_goal"), timePassed / fallDuration);
+                        } else
+                        {
+                            devourer4GO.transform.position = sequencer.Vars.GetVector("monster4_goal");
+                            if(!sequencer.Vars.IsStringSet("monster4_playedsound"))
+                            {
+                                devourer4GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
+                                sequencer.Vars.SetString("monster4_playedsound", "");
+                            }
+                        }
+                    }
+                    if (monster5Appeared)
+                    {
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster5_appeared"));
+                        if (timePassed < fallDuration)
+                        {
+                            devourer5GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster5_position"), sequencer.Vars.GetVector("monster5_goal"), timePassed / fallDuration);
+                        } else
+                        {
+                            devourer5GO.transform.position = sequencer.Vars.GetVector("monster5_goal");
+                            if(!sequencer.Vars.IsStringSet("monster5_playedsound"))
+                            {
+                                devourer5GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
+                                sequencer.Vars.SetString("monster5_playedsound", "");
+                            }
+                        }
+                    }
+                    if (monster6Appeared)
+                    {
+                        timePassed = sequencer.TimeElapsed - float.Parse(sequencer.Vars.GetString("monster6_appeared"));
+                        if (timePassed < fallDuration)
+                        {
+                            devourer6GO.transform.position = Vector3.Lerp(sequencer.Vars.GetVector("monster6_position"), sequencer.Vars.GetVector("monster6_goal"), timePassed / fallDuration);
+                        } else
+                        {
+                            devourer6GO.transform.position = sequencer.Vars.GetVector("monster6_goal");
+                            if(!sequencer.Vars.IsStringSet("monster6_playedsound"))
+                            {
+                                devourer6GO.GetComponent<AudioSource>().PlayOneShot(Resources.Load<AudioClip>("Sounds/gnjec"));
+                                sequencer.Vars.SetString("monster6_playedsound", "");
                             }
 
                             sequencer.SceneSequenceFinished = true;

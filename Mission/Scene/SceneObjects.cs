@@ -189,6 +189,8 @@ public class SceneObjects
 
     public void RestartMission()//TODO move, temporary solution
     {
+        GameMissions gameMissions = new GameMissions();
+        MissionData.SetInstance(gameMissions.Missions[0]);//TODO move
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
