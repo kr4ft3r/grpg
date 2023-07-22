@@ -121,6 +121,8 @@ public class MissionUI : MonoBehaviour
     {
         if (show) // Load visuals
         {
+            // HP
+            _sceneObjects.CharacterPanel.transform.Find("HealthCounter").GetComponent<TMP_Text>().text = _activeActor.Resources[Resource.HitPoints].ToString();
             // Name
             _sceneObjects.CharacterPanel.transform.Find("CharacterName").GetComponent<TMP_Text>().text = _activeActor.Name.ToUpper();
             // Portrait and background
@@ -196,6 +198,25 @@ public class MissionUI : MonoBehaviour
                 SetCharacterButtonStateBlank(ActionPresentationData.IconSlotSecondary);
             if (!assignedButtons.Contains(ActionPresentationData.IconSlotSpecial))
                 SetCharacterButtonStateBlank(ActionPresentationData.IconSlotSpecial);
+
+            // Character selectors
+            List<Actor> teamMembers = _activeActor.Mission.GetTeamMembers(_activeTeam).Where(a => a.Name != _activeActor.Name).ToList();
+            int memberIndex = 0;
+            foreach (Actor actor in teamMembers)
+            {
+                memberIndex++;
+                if (memberIndex > 2) continue; // we only support 3 member teams for now, TODO
+                Debug.Log(memberIndex + "~~HP " + actor.Name + actor.Resources[Resource.HitPoints] + "/" + ActorManager.Instance.ActorsStartingHP[actor.Name]);
+                CharacterSelectorButton selector = _sceneObjects.CharacterPanel.transform.Find("CharacterSelector" + memberIndex)
+                    .GetComponent<CharacterSelectorButton>();
+                selector.Set(actor, _sceneObjects.CharacterPresentations[actor.Name], _sceneObjects.CharacterPanel, this);
+                /*_sceneObjects.CharacterPanel.transform.
+                    Find("CharacterSelector" + memberIndex).GetComponent<Image>().sprite =
+                        Resources.Load<Sprite>("Images/Portraits/" + _sceneObjects.CharacterPresentations[actor.Name].Portrait);
+                _sceneObjects.CharacterPanel.transform.
+                    Find("CharacterSelectorHP" + memberIndex).localScale
+                    = new Vector3((float)actor.Resources[Resource.HitPoints] / (float)ActorManager.Instance.ActorsStartingHP[actor.Name], 1, 1);*/
+            }
 
         }
 

@@ -12,6 +12,7 @@ public class ActorManager
     public static ActorManager Instance;
 
     private Dictionary<string, Actor> _actors;
+    public Dictionary<string, int> ActorsStartingHP;//HACK
 
     public ActorGainedActionDelegate ActorGainedAction;
     public ActorLostActionDelegate ActorLostAction;
@@ -19,6 +20,11 @@ public class ActorManager
     public ActorManager(Dictionary<string, Actor> actors)
     {
         _actors = actors;
+        ActorsStartingHP = new Dictionary<string, int>();//ugly
+        foreach(KeyValuePair<string,Actor> kv in _actors)
+        {
+            ActorsStartingHP.Add(kv.Key, kv.Value.Stats.PerBattleResources[Resource.HitPoints]);
+        }
 
         Instance = this;
     }
