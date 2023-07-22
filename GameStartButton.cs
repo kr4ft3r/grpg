@@ -20,6 +20,6 @@ public class GameStartButton : MonoBehaviour
 
     public void StartClicked()
     {
-        SceneManager.LoadScene("mission1");
+        SceneManager.LoadScene("mission" + (GameMain.Instance.GetCurrentMissionIndex() + 1));
     }
 }

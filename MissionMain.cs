@@ -5,6 +5,14 @@ using UnityEngine;
 
 using GRPG.GameLogic;
 
+/// <summary>
+/// Main loader for missions.
+/// 
+/// Mission scene needs:
+/// - Main Camera with components MissionCamera and AudioListener
+/// - Object called "Mission" with components MissionMain, MissionUI, and Sequencer, with all fields default for all components
+/// - Scene lighting must be baked in Unity settings in order to work when loading scene
+/// </summary>
 public class MissionMain : MonoBehaviour
 {
     /// <summary>

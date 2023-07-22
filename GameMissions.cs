@@ -16,16 +16,22 @@ public class GameMissions
     public List<MissionData> Missions { get; private set; }
     public GameMissions()
     {
-        Missions = new List<MissionData>() { 
+        Missions = new List<MissionData>() {
             new MissionData(
                 "Cave of Devourers",
                 Mission1_Actors(),
                 Mission1_SceneSequences(),
                 new Dictionary<string, Action>()
                 {
-                    {"SearchSkeleton", RoaringStarActions.GetSearchSkeletonSceneAction() } 
+                    {"SearchSkeleton", RoaringStarActions.GetSearchSkeletonSceneAction() }
                 }
-                )
+                ),
+            new MissionData(
+                "Hideaway Planet",
+                Mission2_Actors(),
+                Mission2_SceneSequences(),
+                new Dictionary<string, Action>(){ 
+                })
         };
     }
 
@@ -52,6 +58,7 @@ public class GameMissions
             new CharacterPresentation(
                 "Simone",
                 "testsimone",
+                "Simone_thumb",
                 "OrbSimone",
                 2f, 4f,
                 null,
@@ -66,10 +73,11 @@ public class GameMissions
         andreaStats.PerBattleResources = new CounterDict<Resource>() { };
         andreaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Andrea", new MissionActorBlueprint(
-            "Andrea", 48,
+            "Andrea", 54,
             new CharacterPresentation(
                 "Andrea",
                 "testportrait",
+                "Andrea_thumb",
                 "OrbAndrea",
                 2f, 4f,
                 null,
@@ -84,10 +92,11 @@ public class GameMissions
         redStats.PerBattleResources = new CounterDict<Resource>() { };
         redStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Red", new MissionActorBlueprint(
-            "Red", 28,
+            "Red", 30,
             new CharacterPresentation(
                 "Red",
                 "testred",
+                "Red_thumb",
                 "OrbAndrea",
                 2f, 4f,
                 null,
@@ -107,7 +116,7 @@ public class GameMissions
             "Devourer", 10,
             new CharacterPresentation(
                 "Devourer",
-                null, null,
+                null, null, null,
                 1.5f, 3,
                 walkSprites: new List<string>() { "Demon/walk1", "Demon/walk2", "Demon/walk3", "Demon/walk4" },
                 null,
@@ -329,8 +338,10 @@ public class GameMissions
                         ("Andrea", "And you got some tricks on you as well. What was that, with you teleporting about?"),
                         ("Simone", "I honestly don’t know, Andy. I just got so scared of monsters, I wished to be somewhere else and all of a sudden I really was somewhere else!"),
                         ("Red", "If you’re done celebrating the little brat’s demonic powers, I would like to announce that I have found a treasure map on this unlucky individual."),
-                        ("Andrea", "A treasure map you say? Now that brings an old itch.")
+                        ("Andrea", "A treasure map you say? Now that brings an old itch."),
+                        ("Andrea", "A treasure map you say? Now that brings an old itch.")//TODO
                     });
+                    if (!sequencer.Vars.IsStringSet("_dialogue_" + 6)) GameMain.Instance.NextMission();//TODO temp.
                 }},
                 {"simone_search_skeleton", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
                     //if (!sequencer.IsStringSet("_dialogue_" + 0))
@@ -371,4 +382,99 @@ public class GameMissions
             );
     }
 
+    /**
+     * Mission 2: Hideaway Planet
+     */
+
+    private Dictionary<string, MissionActorBlueprint> Mission2_Actors()
+    {
+        Dictionary<string, MissionActorBlueprint> actors = new Dictionary<string, MissionActorBlueprint>();
+
+        // Simona
+        CharacterStats simonaStats = new CharacterStats();
+        simonaStats.Actions = new List<Action>() { Action.Move };
+        simonaStats.PerBattleResources = new CounterDict<Resource>() { };
+        simonaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
+        actors.Add("Simone", new MissionActorBlueprint(
+            "Simone", 18,
+            new CharacterPresentation(
+                "Simone",
+                "testsimone",
+                "Simone_thumb",
+                "OrbSimone",
+                2f, 4f,
+                null,
+                "Placeholder/graphics-sprites-WOAsprite"),
+            simonaStats,
+            Team.Human,
+            0));
+
+        // Andrea
+        CharacterStats andreaStats = new CharacterStats();
+        andreaStats.Actions = new List<Action>() { Action.Move, RoaringStarActions.GetTankAction(1) };
+        andreaStats.PerBattleResources = new CounterDict<Resource>() { };
+        andreaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
+        actors.Add("Andrea", new MissionActorBlueprint(
+            "Andrea", 48,
+            new CharacterPresentation(
+                "Andrea",
+                "testportrait",
+                "Andrea_thumb",
+                "OrbAndrea",
+                2f, 4f,
+                null,
+                "Placeholder/graphics-sprites-WOAsprite"),
+            andreaStats,
+            Team.Human,
+            0));
+
+        // Red
+        CharacterStats redStats = new CharacterStats();
+        redStats.Actions = new List<Action>() { Action.Move, RoaringStarActions.GetFleeAction(1) };
+        redStats.PerBattleResources = new CounterDict<Resource>() { };
+        redStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
+        actors.Add("Red", new MissionActorBlueprint(
+            "Red", 28,
+            new CharacterPresentation(
+                "Red",
+                "testred",
+                "Red_thumb",
+                "OrbAndrea",
+                2f, 4f,
+                null,
+                "Placeholder/graphics-sprites-WOAsprite"),
+            redStats,
+            Team.Human,
+            0));
+
+        return actors;
+    }
+
+    private SceneSequenceData Mission2_SceneSequences()
+    {
+        return new SceneSequenceData(
+            new Dictionary<string, System.Action<MissionUI, Sequencer, SceneObjects, float>>()
+            {
+                {"player_character_died", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    string deadCharacter = sequencer.MissionVars.GetString("_dead_character");
+                    sequencer.HandleDialogue(new List<(string,string)>() {
+                        ("Simone", "No, "+deadCharacter+"! This can't be happpening... This did NOT happen!!!"),
+                        ("Simone", "* TODO: insert some short but epic screen-wide blast, as Simone alters reality *")
+                    }, "mission_failed");
+                }},
+                {"mission_failed", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
+                    sceneObjects.RestartMission();
+                } },
+                {"intro", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) => {
+                    sequencer.HandleDialogue(new List<(string,string)>(){
+                        ("Andrea", "Uh oh...")
+                    });
+                }},
+                {"outro", (MissionUI missionUI, Sequencer sequencer, SceneObjects sceneObjects, float deltaTime) =>{
+                    sequencer.HandleDialogue(new List<(string,string)>() {
+                        ("Andrea", "We done, ye.")
+                    });
+                }},
+            });
+    }
 }

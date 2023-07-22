@@ -9,6 +9,7 @@ public struct CharacterPresentation
         //TODO maybe name here
         string name,
         string portrait = null,
+        string thumb = null,
         string backgroundMaterial = null,
         float actorWidth = 2,
         float actorHeight = 4,
@@ -19,6 +20,7 @@ public struct CharacterPresentation
     {
         Name = name;
         Portrait = portrait;
+        Thumb = thumb;
         BackgroundMaterial = backgroundMaterial;
         WalkSpritesPaths = walkSprites;
         IdleSpriteSheetPath = idleSpriteSheet;
@@ -59,6 +61,10 @@ public struct CharacterPresentation
     /// Sprite at Resources/Images/Portraits/
     /// </summary>
     public string Portrait;
+    /// <summary>
+    /// Smaller portrait (200x200)
+    /// </summary>
+    public string Thumb;
     /// <summary>
     /// Sprite at Resources/Images/
     /// </summary>

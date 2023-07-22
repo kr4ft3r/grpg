@@ -23,7 +23,7 @@ public class CharacterSelectorButton : MonoBehaviour
         _actor = actor;
         ActorName = actor.Name;
         CharacterName = presentation.Name;
-        Portrait = Resources.Load<Sprite>("Images/Portraits/" + presentation.Portrait);
+        Portrait = Resources.Load<Sprite>("Images/Portraits/" + presentation.Thumb);
         HP = actor.Resources[Resource.HitPoints];
         StartingHP = ActorManager.Instance.ActorsStartingHP[actor.Name];
 
