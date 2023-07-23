@@ -47,10 +47,11 @@ public class GameMissions
     private Dictionary<string, MissionActorBlueprint> Mission1_Actors()
     {
         Dictionary<string, MissionActorBlueprint> actors = new Dictionary<string, MissionActorBlueprint>();
+        Dictionary<string, Dictionary<string, int>> skills = CharacterSkills.GetSkillsWithUpgrades(GameMain.Instance.GameState);
 
         // Simona
         CharacterStats simonaStats = new CharacterStats();
-        simonaStats.Actions = new List<Action>() { Action.Move };
+        simonaStats.Actions = CharacterSkills.SimoneMissionActions(skills["Simone"]); //new List<Action>() { Action.Move };
         simonaStats.PerBattleResources = new CounterDict<Resource>() { };
         simonaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Simone", new MissionActorBlueprint(
@@ -69,7 +70,7 @@ public class GameMissions
 
         // Andrea
         CharacterStats andreaStats = new CharacterStats();
-        andreaStats.Actions = new List<Action>() { Action.Move, RoaringStarActions.GetTankAction(1) };
+        andreaStats.Actions = CharacterSkills.AndreaMissionActions(skills["Andrea"]);//new List<Action>() { Action.Move, RoaringStarActions.GetTankAction(1) };
         andreaStats.PerBattleResources = new CounterDict<Resource>() { };
         andreaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Andrea", new MissionActorBlueprint(
@@ -88,7 +89,7 @@ public class GameMissions
 
         // Red
         CharacterStats redStats = new CharacterStats();
-        redStats.Actions = new List<Action>() { Action.Move, RoaringStarActions.GetFleeAction(1) };
+        redStats.Actions = CharacterSkills.RedMissionActions(skills["Red"]); //new List<Action>() { Action.Move, RoaringStarActions.GetFleeAction(1) };
         redStats.PerBattleResources = new CounterDict<Resource>() { };
         redStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Red", new MissionActorBlueprint(
