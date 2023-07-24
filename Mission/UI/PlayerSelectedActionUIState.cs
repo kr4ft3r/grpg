@@ -50,7 +50,7 @@ public class PlayerSelectedActionUIState : UIState
 
         // Animate active action button
         _sceneObjects.CharacterPanel.transform
-            .Find(_sceneObjects.ActionPresentations[_action.Name].iconSlot)
+            .Find(GameActions.Presentations[_action.Name].iconSlot)
             .GetComponent<ActionButtonScript>().SetButtonActive(true);
         /*activeActionButton.GetComponent<Animator>()
             .SetBool("isActive", true);
@@ -63,7 +63,7 @@ public class PlayerSelectedActionUIState : UIState
         _missionUI.HoverCursorText = "";
         _sceneObjects.HideAllLocations();
         GameObject activeActionButton = _sceneObjects.CharacterPanel.transform
-            .Find(_sceneObjects.ActionPresentations[_action.Name].iconSlot).gameObject;
+            .Find(GameActions.Presentations[_action.Name].iconSlot).gameObject;
         activeActionButton.GetComponent<Animator>()
             .SetBool("isActive", false);
         activeActionButton.GetComponent<ActionButtonScript>().Active = false;

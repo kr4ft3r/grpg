@@ -56,14 +56,7 @@ public class GameMissions
         simonaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Simone", new MissionActorBlueprint(
             "Simone", 18,
-            new CharacterPresentation(
-                "Simone",
-                "testsimone",
-                "Simone_thumb",
-                "OrbSimone",
-                2f, 4f,
-                null,
-                "Placeholder/graphics-sprites-WOAsprite"),
+            PersistentCharacters.SimonePresentation,
             simonaStats,
             Team.Human,
             0));
@@ -75,14 +68,7 @@ public class GameMissions
         andreaStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Andrea", new MissionActorBlueprint(
             "Andrea", 54,
-            new CharacterPresentation(
-                "Andrea",
-                "testportrait",
-                "Andrea_thumb",
-                "OrbAndrea",
-                2f, 4f,
-                null,
-                "Placeholder/graphics-sprites-WOAsprite"),
+            PersistentCharacters.AndreaPresentation,
             andreaStats,
             Team.Human,
             0));
@@ -94,14 +80,7 @@ public class GameMissions
         redStats.PerTurnResources = new CounterDict<Resource>() { { Resource.MoveAction, 1 }, { Resource.PrimaryAction, 1 } };
         actors.Add("Red", new MissionActorBlueprint(
             "Red", 30,
-            new CharacterPresentation(
-                "Red",
-                "testred",
-                "Red_thumb",
-                "OrbAndrea",
-                2f, 4f,
-                null,
-                "Placeholder/graphics-sprites-WOAsprite"),
+            PersistentCharacters.RedPresentation,
             redStats,
             Team.Human,
             0));

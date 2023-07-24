@@ -16,6 +16,7 @@ public class GameMain : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Instance = this;
 
+        GameActions.Init();
         GameState = new GameState("0.1");
         SetStartingSkills();
         SetEmptyUpgrades();
@@ -29,10 +30,10 @@ public class GameMain : MonoBehaviour
 
     public void NextMission()
     {
-        SetEmptyUpgrades();
+        ApplyUpgrades();
         GameState.MissionIndex++;
         MissionData.SetInstance(_missionData[GameState.MissionIndex]);
-        SceneManager.LoadScene("mission" + (GameState.MissionIndex + 1));
+        SceneManager.LoadScene("mission" + (GameState.MissionIndex + 1));//TODO load upgrade screen first
     }
 
     private void SetStartingSkills()
@@ -49,6 +50,14 @@ public class GameMain : MonoBehaviour
             GameState.RedSkills[SkillLine.RedPrimary] = 0;
             SetEmptyUpgrades();
         }
+    }
+
+    private void ApplyUpgrades()
+    {
+        GameState.SimoneSkills = CharacterSkills.GetSkillsWithUpgrades(GameState)["Simone"];
+        GameState.AndreaSkills = CharacterSkills.GetSkillsWithUpgrades(GameState)["Andrea"];
+        GameState.RedSkills = CharacterSkills.GetSkillsWithUpgrades(GameState)["Red"];
+        SetEmptyUpgrades();
     }
 
     private void SetEmptyUpgrades()

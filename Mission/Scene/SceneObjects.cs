@@ -11,7 +11,6 @@ public class SceneObjects
     public Dictionary<Actor,GameObject> ActorObjects { get; private set; }
     public Dictionary<GameObject,int> ActorGOLocationMap { get; private set; }
     public Dictionary<GameObject,int> ActorGOLocationSlotMap { get; private set; }
-    public Dictionary<string,ActionPresentationData> ActionPresentations { get; private set; }
     public Dictionary<string,CharacterPresentation> CharacterPresentations { get; private set; }
     public GameObject CharacterPanel;
     public GameObject DialoguePanel;
@@ -25,7 +24,6 @@ public class SceneObjects
         ActorObjects = new Dictionary<Actor, GameObject>();
         ActorGOLocationMap = new Dictionary<GameObject, int>();
         ActorGOLocationSlotMap = new Dictionary<GameObject, int>();
-        ActionPresentations = new Dictionary<string, ActionPresentationData>();
         CharacterPresentations = new Dictionary<string, CharacterPresentation>();
         this.sequencer = sequencer;
         sequencer.SceneObjects = this;
@@ -159,8 +157,8 @@ public class SceneObjects
         float delay = 0;
         Debug.Log("  ==DAMAGED Action:" + damage.Action.Name);
         Debug.Log("  ==DAMAGED IsNull:" + damage.Action.IsNull());
-        if (!damage.Action.IsNull()) Debug.Log("  ==DAMAGED delay:" + ActionPresentations[damage.Action.Name].showDamageDelay);
-        if (!damage.Action.IsNull()) delay = ActionPresentations[damage.Action.Name].showDamageDelay;
+        if (!damage.Action.IsNull()) Debug.Log("  ==DAMAGED delay:" + GameActions.Presentations[damage.Action.Name].showDamageDelay);
+        if (!damage.Action.IsNull()) delay = GameActions.Presentations[damage.Action.Name].showDamageDelay;
         GetActorGO(actor).GetComponent<SceneActor>().TakeDamage(damage, actor.Resources[Resource.HitPoints], delay);
     }
 

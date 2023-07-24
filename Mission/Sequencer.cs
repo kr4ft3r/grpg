@@ -106,7 +106,7 @@ public class Sequencer : MonoBehaviour
 
     void HandleResultFrame(ActionResult result)
     {
-        ActionPresentationData presentation = SceneObjects.ActionPresentations[result.Action.Name]; //TODO cache this
+        ActionPresentationData presentation = GameActions.Presentations[result.Action.Name]; //TODO cache this
         PerformSoundPath = presentation.performSound;
         SuccessSoundPath = presentation.successSound;
         FailSoundPath = presentation.failSound;

@@ -153,12 +153,12 @@ public class MissionUI : MonoBehaviour
             foreach (Action action in characterActions)
             {
 
-                if (!_sceneObjects.ActionPresentations.ContainsKey(action.Name))
+                if (!GameActions.Presentations.ContainsKey(action.Name))
                 {
                     Debug.LogError("action not found in presentation dictionary: " + action.Name);
                     continue;
                 }
-                ActionPresentationData presentation = _sceneObjects.ActionPresentations[action.Name];
+                ActionPresentationData presentation = GameActions.Presentations[action.Name];
                 GameObject actionButton = _sceneObjects.CharacterPanel.transform.Find(presentation.iconSlot).gameObject;
                 ActionButtonScript buttonScript = actionButton.GetComponent<ActionButtonScript>();
 
